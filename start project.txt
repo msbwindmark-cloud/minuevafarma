@@ -18,6 +18,8 @@ git push -u origin main
 farmacia
 Farmacia@2026
 
+https://minuevafarma.pythonanywhere.com/
+
 
 
 
