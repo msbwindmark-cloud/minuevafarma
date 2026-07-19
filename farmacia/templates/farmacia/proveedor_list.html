@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Proveedores{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li><li class="breadcrumb-item"><a href="{% url 'producto_list' %}">Productos</a></li><li class="breadcrumb-item active">Proveedores</li></ol></nav>
+<div class="d-flex justify-content-between mb-3"><h2><i class="bi bi-truck"></i> Proveedores</h2>
+<a href="{% url 'proveedor_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Nuevo</a></div>
+<div class="card shadow"><div class="card-body p-0">
+<table class="table mb-0"><thead class="table-light"><tr><th>Nombre</th><th>CIF</th><th>Email</th><th>Teléfono</th><th></th></tr></thead>
+<tbody>{% for p in provs %}<tr><td>{{ p.nombre }}</td><td>{{ p.cif|default:"-" }}</td><td>{{ p.email|default:"-" }}</td><td>{{ p.telefono|default:"-" }}</td>
+<td class="text-end"><a href="{% url 'proveedor_update' p.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+<a href="{% url 'proveedor_delete' p.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a></td></tr>{% empty %}<tr><td colspan="5" class="text-center">Sin proveedores</td></tr>{% endfor %}</tbody></table>
+</div></div>{% endblock %}

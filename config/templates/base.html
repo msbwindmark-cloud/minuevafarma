@@ -16,6 +16,8 @@
         <div class="container">
             <a class="navbar-brand" href="{% url 'dashboard' %}"><i class="bi bi-capsule"></i> MiNuevaFarma</a>
             <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'dashboard' %}"><i class="bi bi-house"></i> Inicio</a>
+                <a class="nav-link" href="{% url 'producto_list' %}"><i class="bi bi-box-seam"></i> Productos</a>
                 <span class="nav-item text-white me-3 mt-2">{{ user.nombre_completo }}</span>
                 <a class="nav-link" href="{% url 'perfil' %}"><i class="bi bi-person"></i> Perfil</a>
                 <a class="nav-link" href="{% url 'auditoria' %}"><i class="bi bi-shield-check"></i> Auditoría</a>

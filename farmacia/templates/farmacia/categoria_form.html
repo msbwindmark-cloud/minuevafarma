@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Nueva categoría{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li><li class="breadcrumb-item"><a href="{% url 'categoria_list' %}">Categorías</a></li><li class="breadcrumb-item active">Nueva</li></ol></nav>
+<h2 class="mb-3">Nueva categoría</h2>
+<div class="card shadow"><div class="card-body">
+<form method="post">{% csrf_token %}<div class="mb-3">{{ form.nombre.label_tag }}{{ form.nombre }}</div>
+<div class="mb-3">{{ form.descripcion.label_tag }}{{ form.descripcion }}</div>
+<div class="mb-3">{{ form.activo.label_tag }} {{ form.activo }}</div>
+<button type="submit" class="btn btn-primary">Guardar</button><a href="{% url 'categoria_list' %}" class="btn btn-secondary">Cancelar</a></form>
+</div></div>{% endblock %}

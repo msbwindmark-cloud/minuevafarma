@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ titulo }} - MiNuevaFarma{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li><li class="breadcrumb-item"><a href="{% url 'producto_list' %}">Productos</a></li><li class="breadcrumb-item active">{{ titulo }}</li></ol></nav>
+<h2 class="mb-3">{{ titulo }}</h2>
+<div class="card shadow">
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-4 mb-3">{{ form.codigo.label_tag }}{{ form.codigo }}</div>
+                <div class="col-md-8 mb-3">{{ form.nombre.label_tag }}{{ form.nombre }}</div>
+                <div class="col-md-4 mb-3">{{ form.categoria.label_tag }}{{ form.categoria }}</div>
+                <div class="col-md-4 mb-3">{{ form.proveedor.label_tag }}{{ form.proveedor }}</div>
+                <div class="col-md-4 mb-3">{{ form.unidad.label_tag }}{{ form.unidad }}</div>
+                <div class="col-md-4 mb-3">{{ form.precio_compra.label_tag }}{{ form.precio_compra }}</div>
+                <div class="col-md-4 mb-3">{{ form.precio_venta.label_tag }}{{ form.precio_venta }}</div>
+                <div class="col-md-4 mb-3">{{ form.stock_actual.label_tag }}{{ form.stock_actual }}</div>
+                <div class="col-md-4 mb-3">{{ form.stock_minimo.label_tag }}{{ form.stock_minimo }}</div>
+                <div class="col-md-4 mb-3">{{ form.ubicacion.label_tag }}{{ form.ubicacion }}</div>
+                <div class="col-md-4 mb-3">{{ form.caducidad.label_tag }}{{ form.caducidad }}</div>
+                <div class="col-md-12 mb-3">{{ form.descripcion.label_tag }}{{ form.descripcion }}</div>
+                <div class="col-md-12 mb-3">{{ form.foto.label_tag }}{{ form.foto }}</div>
+                <div class="col-md-12">{{ form.activo.label_tag }} {{ form.activo }}</div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3"><i class="bi bi-save"></i> Guardar</button>
+            <a href="{% url 'producto_list' %}" class="btn btn-secondary mt-3">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

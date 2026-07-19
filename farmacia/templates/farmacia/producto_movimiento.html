@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Movimiento de stock{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li><li class="breadcrumb-item"><a href="{% url 'producto_list' %}">Productos</a></li><li class="breadcrumb-item active">Movimiento</li></ol></nav>
+<div class="row justify-content-center mt-3">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-body">
+                <h4>Movimiento de stock</h4>
+                <p class="text-muted">{{ producto.nombre }} — Stock actual: <strong>{{ producto.stock_actual }}</strong></p>
+                <form method="post" id="movForm">
+                    {% csrf_token %}
+                    <div class="mb-3">{{ form.tipo.label_tag }}{{ form.tipo }}</div>
+                    <div class="mb-3">{{ form.cantidad.label_tag }}{{ form.cantidad }}</div>
+                    <div class="mb-3">{{ form.motivo.label_tag }}{{ form.motivo }}</div>
+                    <button type="submit" class="btn btn-primary">Registrar</button>
+                    <a href="{% url 'producto_list' %}" class="btn btn-secondary">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+$('#movForm').on('submit', function(e){
+    e.preventDefault();
+    var tipo = $('#id_tipo option:selected').text();
+    var cant = $('#id_cantidad').val();
+    Swal.fire({
+        title: '¿Confirmar movimiento?',
+        html: 'Tipo: <b>'+tipo+'</b><br>Cantidad: <b>'+cant+'</b><br>Esta acción afecta al stock real.',
+        icon: 'warning', showCancelButton: true, confirmButtonText: 'Sí, registrar', cancelButtonText: 'Cancelar'
+    }).then(function(r){
+        if(r.isConfirmed){ e.target.submit(); }
+    });
+});
+</script>
+{% endblock %}

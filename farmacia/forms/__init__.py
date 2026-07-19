@@ -82,3 +82,65 @@ class PerfilForm(forms.ModelForm):
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'foto': forms.FileInput(attrs={'class': 'form-control'}),
         }
+from django import forms
+from farmacia.models import Producto, Categoria, Proveedor, MovimientoStock
+
+
+class CategoriaForm(forms.ModelForm):
+    class Meta:
+        model = Categoria
+        fields = ['nombre', 'descripcion', 'activo']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'activo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+
+class ProveedorForm(forms.ModelForm):
+    class Meta:
+        model = Proveedor
+        fields = ['nombre', 'cif', 'email', 'telefono', 'direccion', 'activo']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'cif': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
+            'direccion': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'activo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+
+class ProductoForm(forms.ModelForm):
+    class Meta:
+        model = Producto
+        fields = ['codigo', 'nombre', 'descripcion', 'categoria', 'proveedor', 'unidad',
+                  'precio_compra', 'precio_venta', 'stock_actual', 'stock_minimo',
+                  'ubicacion', 'caducidad', 'foto', 'activo']
+        widgets = {
+            'codigo': forms.TextInput(attrs={'class': 'form-control'}),
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'categoria': forms.Select(attrs={'class': 'form-control'}),
+            'proveedor': forms.Select(attrs={'class': 'form-control'}),
+            'unidad': forms.Select(attrs={'class': 'form-control'}),
+            'precio_compra': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'precio_venta': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'stock_actual': forms.NumberInput(attrs={'class': 'form-control'}),
+            'stock_minimo': forms.NumberInput(attrs={'class': 'form-control'}),
+            'ubicacion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'A3'}),
+            'caducidad': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'foto': forms.FileInput(attrs={'class': 'form-control'}),
+            'activo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+
+class MovimientoForm(forms.ModelForm):
+    class Meta:
+        model = MovimientoStock
+        fields = ['tipo', 'cantidad', 'motivo']
+        widgets = {
+            'tipo': forms.Select(attrs={'class': 'form-control'}),
+            'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
+            'motivo': forms.TextInput(attrs={'class': 'form-control'}),
+        }
