@@ -6,6 +6,8 @@ from farmacia.views import caja_views as views_caja
 from farmacia.views.ventas import venta_anular
 from farmacia.views import export_views as exp
 from farmacia.views.clientes_views import cliente_list as _cliente_list
+from farmacia.views.recordatorios_views import recordatorio_list, recordatorio_crear, recordatorio_reenviar, campana_enviar
+from farmacia.views.pedidos_views import pedido_sugerir, pedido_generar, pedido_list, pedido_detalle, pedido_pdf
 
 
 urlpatterns = [
@@ -60,6 +62,15 @@ urlpatterns = [
     path('export/movimientos/<str:fmt>/', exp.export_movimientos, name='export_movimientos'),
     path('export/caja/<str:fmt>/', exp.export_caja, name='export_caja'),
     path('clientes/', _cliente_list, name='cliente_list'),
+    path('recordatorios/', recordatorio_list, name='recordatorio_list'),
+    path('recordatorios/crear/', recordatorio_crear, name='recordatorio_crear'),
+    path('recordatorios/reenviar/<uuid:pk>/', recordatorio_reenviar, name='recordatorio_reenviar'),
+    path('campanas/', campana_enviar, name='campana_enviar'),
+    path('pedidos/sugerir/', pedido_sugerir, name='pedido_sugerir'),
+    path('pedidos/generar/', pedido_generar, name='pedido_generar'),
+    path('pedidos/', pedido_list, name='pedido_list'),
+    path('pedidos/<uuid:pk>/', pedido_detalle, name='pedido_detalle'),
+    path('pedidos/<uuid:pk>/pdf/', pedido_pdf, name='pedido_pdf'),
     path('export/categorias/<str:fmt>/', exp.export_categorias, name='export_categorias'),
     path('export/proveedores/<str:fmt>/', exp.export_proveedores, name='export_proveedores'),
     path('export/alertas/<str:fmt>/', exp.export_alertas, name='export_alertas'),

@@ -6,9 +6,11 @@ from .ventas import Venta, DetalleVenta
 from .clientes import Cliente
 from .recordatorios import Recordatorio
 from .caja import Caja
+from .pedidos import PedidoProveedor, LineaPedido
 
 __all__ = [
     'Usuario', 'Rol', 'UsuarioManager', 'Auditoria',
     'Categoria', 'Proveedor', 'Producto', 'MovimientoStock',
     'Empleado', 'Fichaje', 'Venta', 'DetalleVenta', 'Cliente', 'Recordatorio', 'Caja',
+    'PedidoProveedor', 'LineaPedido',
 ]

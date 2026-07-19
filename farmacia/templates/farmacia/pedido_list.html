@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Pedidos{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li><li class="breadcrumb-item active">Pedidos</li></ol></nav>
+<div class="d-flex justify-content-between align-items-center mb-3"><h2 class="mb-0"><i class="bi bi-truck"></i> Pedidos a proveedores</h2>
+<a href="{% url 'pedido_sugerir' %}" class="btn btn-primary btn-sm"><i class="bi bi-magic"></i> Sugerir pedido (stock bajo)</a></div>
+<div class="card shadow"><div class="card-body p-0">
+<table class="table table-sm mb-0 datatable"><thead class="table-light"><tr><th>ID</th><th>Fecha</th><th>Proveedor</th><th>Líneas</th><th>Estado</th><th></th></tr></thead>
+<tbody>{% for p in pedidos %}<tr><td>{{ p.id }}</td><td>{{ p.fecha|date:"d/m/Y H:i" }}</td><td>{{ p.proveedor }}</td><td>{{ p.lineas.count }}</td>
+<td><span class="badge {% if p.estado == 'RECIBIDO' %}bg-success{% elif p.estado == 'ENVIADO' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">{{ p.get_estado_display }}</span></td>
+<td class="text-end"><a href="{% url 'pedido_detalle' p.id %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a></td></tr>{% empty %}<tr><td colspan="6" class="text-center">Sin pedidos</td></tr>{% endfor %}</tbody></table>
+</div></div>
+{% endblock %}

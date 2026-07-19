@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Campaña masiva{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li><li class="breadcrumb-item"><a href="{% url 'recordatorio_list' %}">Recordatorios</a></li><li class="breadcrumb-item active">Campaña</li></ol></nav>
+<div class="row g-3">
+<div class="col-md-5">
+<div class="card shadow"><div class="card-body">
+<h6>Resumen de clientes</h6>
+<p>Total clientes: <strong>{{ total }}</strong></p>
+<p>Fidelizados (con puntos): <strong class="text-success">{{ fidelizados }}</strong></p>
+</div></div>
+</div>
+<div class="col-md-7">
+<div class="card shadow"><div class="card-body">
+<h4><i class="bi bi-megaphone"></i> Campaña a clientes</h4>
+<form method="post">{% csrf_token %}
+<div class="mb-2"><label class="form-label">Canal</label><select name="canal" class="form-control"><option value="EMAIL">Email</option><option value="SMS">SMS</option></select></div>
+<div class="mb-2"><label class="form-label">Solo clientes con al menos N puntos</label><input type="number" name="min_puntos" value="0" min="0" class="form-control"></div>
+<div class="mb-2"><label class="form-label">Asunto</label><input name="asunto" class="form-control" value="Ofertas MiNuevaFarma"></div>
+<div class="mb-2"><label class="form-label">Mensaje</label><textarea name="mensaje" class="form-control" rows="4" required placeholder="Hola {nombre}, ...">Hola {nombre}, en MiNuevaFarma tenemos novedades y promociones para ti. ¡Te esperamos!</textarea></div>
+<button class="btn btn-warning"><i class="bi bi-send"></i> Enviar campaña</button>
+<a href="{% url 'recordatorio_list' %}" class="btn btn-light">Cancelar</a>
+</form>
+</div></div>
+</div>
+</div>
+{% endblock %}

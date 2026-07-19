@@ -1,3 +1,23 @@
+toyota.msb@gmail.com
+
+rec
+
+dashwood.msb@gmail.com
+
+minuevafarma
+
+
+echo "# minuevafarma" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/msbwindmark-cloud/minuevafarma.git
+git push -u origin main
+
+
+
+
 python -m venv venv
 
 fn f1 interpter selector 

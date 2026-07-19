@@ -25,6 +25,12 @@ bi-receipt"></i> Ventas</a>
 bi-cash-stack"></i> Caja</a>
                 <a class="nav-link" href="{% url 'cliente_list' %}"><i class="bi 
 bi-people"></i> Clientes</a>
+                <a class="nav-link" href="{% url 'recordatorio_list' %}"><i class="bi 
+bi-bell"></i> Recordatorios</a>
+                <a class="nav-link" href="{% url 'campana_enviar' %}"><i class="bi 
+bi-megaphone"></i> Campañas</a>
+                <a class="nav-link" href="{% url 'pedido_list' %}"><i class="bi 
+bi-truck"></i> Pedidos</a>
                 <a class="nav-link" href="{% url 'empleado_list' %}"><i class="bi bi-people"></i> Empleados</a>
                 <a class="nav-link" href="{% url 'offline_app' %}"><i class="bi bi-wifi"></i> App Offline</a>
                 <span class="nav-item text-white me-3 mt-2">{{ user.nombre_completo }}</span>

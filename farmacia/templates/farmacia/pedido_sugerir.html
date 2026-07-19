@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Sugerir pedido{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li><li class="breadcrumb-item active">Sugerir pedido</li></ol></nav>
+<h2 class="mb-3"><i class="bi bi-box-seam"></i> Pedido sugerido (stock bajo)</h2>
+{% if not sugerencias %}
+<div class="alert alert-success">No hay productos con stock bajo. ¡Todo surtido! ✅</div>
+{% else %}
+<form method="post" action="{% url 'pedido_generar' %}">{% csrf_token %}
+<div class="mb-3"><label class="form-label">Proveedor</label><select name="proveedor" class="form-control" required>{% for p in proveedores %}<option value="{{ p.pk }}">{{ p.nombre }}</option>{% endfor %}</select></div>
+<div class="card shadow"><div class="card-body p-0">
+<table class="table table-sm mb-0 datatable"><thead class="table-light"><tr><th></th><th>Producto</th><th>Stock</th><th>Mín</th><th>Proveedor</th><th>Cantidad a pedir</th></tr></thead>
+<tbody>{% for s in sugerencias %}<tr><td><input type="checkbox" name="producto_id" value="{{ s.producto.pk }}" checked></td>
+<td>{{ s.producto.nombre }}</td><td>{{ s.producto.stock_actual }}</td><td>{{ s.producto.stock_minimo }}</td><td>{{ s.proveedor }}</td>
+<td><input type="number" name="cantidad" value="{{ s.sugerida }}" min="0" class="form-control" style="width:110px;"></td></tr>{% endfor %}</tbody></table>
+</div></div>
+<button class="btn btn-primary mt-3"><i class="bi bi-cart-check"></i> Generar pedido sugerido</button>
+</form>
+{% endif %}
+{% endblock %}
