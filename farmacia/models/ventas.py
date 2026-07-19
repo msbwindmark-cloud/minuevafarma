@@ -22,6 +22,8 @@ class Venta(models.Model):
     cambio = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     fecha = models.DateTimeField(default=timezone.now)
     notas = models.TextField(blank=True)
+    receta_imagen = models.ImageField(upload_to='recetas/', blank=True, null=True, verbose_name="Foto de receta")
+    anulada = models.BooleanField(default=False, verbose_name="Anulada")
     ip = models.GenericIPAddressField(blank=True, null=True)
 
     class Meta:

@@ -2,6 +2,8 @@ from django.urls import path
 from farmacia import views
 from farmacia.views import api as api_views
 from farmacia.views.api_offline import api_producto_detalle
+from farmacia.views import caja_views as views_caja
+from farmacia.views.ventas import venta_anular
 
 urlpatterns = [
     path('', views.dashboard, name='dashboard'),
@@ -46,6 +48,9 @@ urlpatterns = [
     path('ventas/ticket/<uuid:pk>/', views.venta_ticket, name='venta_ticket'),
     path('ventas/ticket/pdf/<uuid:pk>/', views.venta_ticket_pdf, name='venta_ticket_pdf'),
     path('ventas/enviar/<uuid:pk>/', views.venta_enviar, name='venta_enviar'),
+    path('ventas/anular/<uuid:pk>/', venta_anular, name='venta_anular'),
+    path('caja/', views_caja.caja_view, name='caja'),
+    path('caja/abrir/', views_caja.caja_abrir, name='caja_abrir'),
     path('ticket/verificar/<uuid:pk>/', views.venta_verificar, name='venta_verificar'),
     path('api/venta/offline/', views.venta_offline, name='venta_offline'),
     path('api/login/', views.api_login, name='api_login'),

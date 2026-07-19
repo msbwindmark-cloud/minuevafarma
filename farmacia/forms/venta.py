@@ -5,7 +5,7 @@ from farmacia.models import Venta, DetalleVenta
 class VentaForm(forms.ModelForm):
     class Meta:
         model = Venta
-        fields = ['cliente_nombre', 'cliente_telefono', 'cliente_email', 'metodo_pago', 'entregado', 'notas']
+        fields = ['cliente_nombre', 'cliente_telefono', 'cliente_email', 'metodo_pago', 'entregado', 'notas', 'receta_imagen']
         widgets = {
             'cliente_nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'cliente_telefono': forms.TextInput(attrs={'class': 'form-control'}),

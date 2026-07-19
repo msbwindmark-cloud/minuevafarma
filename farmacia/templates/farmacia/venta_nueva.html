@@ -24,14 +24,15 @@
 </div>
 </div>
 <div class="card shadow mt-3"><div class="card-body">
-<form method="post">{% csrf_token %}
+<form method="post" enctype="multipart/form-data">{% csrf_token %}
 <div class="row">
 <div class="col-md-4 mb-3">{{ form.cliente_nombre.label_tag }}{{ form.cliente_nombre }}</div>
 <div class="col-md-4 mb-3">{{ form.cliente_telefono.label_tag }}{{ form.cliente_telefono }}</div>
 <div class="col-md-4 mb-3">{{ form.cliente_email.label_tag }}{{ form.cliente_email }}</div>
 <div class="col-md-4 mb-3">{{ form.metodo_pago.label_tag }}{{ form.metodo_pago }}</div>
 <div class="col-md-4 mb-3">{{ form.entregado.label_tag }}{{ form.entregado }}</div>
-<div class="col-md-8 mb-3">{{ form.notas.label_tag }}{{ form.notas }}</div>
+<div class="col-md-4 mb-3">{{ form.receta_imagen.label_tag }}{{ form.receta_imagen }}</div>
+<div class="col-md-12 mb-3">{{ form.notas.label_tag }}{{ form.notas }}</div>
 </div>
 <button type="submit" class="btn btn-success"><i class="bi bi-check-lg"></i> Cobrar y generar ticket</button>
 </form>

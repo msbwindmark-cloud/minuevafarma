@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Anular venta{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li><li class="breadcrumb-item"><a href="{% url 'venta_list' %}">Ventas</a></li><li class="breadcrumb-item active">Anular</li></ol></nav>
+<div class="card shadow mx-auto" style="max-width:520px;">
+<div class="card-body">
+<h4 class="text-danger"><i class="bi bi-x-circle"></i> Anular venta {{ venta.codigo }}</h4>
+<p>Cliente: {{ venta.cliente_nombre|default:"-" }} · Total: {{ venta.total }} EUR</p>
+<p class="text-muted">Se revertirá el stock de {{ venta.detalles.count }} producto(s) y quedará registrada en auditoría.</p>
+<form method="post">{% csrf_token %}
+<div class="mb-3"><label class="form-label">Motivo</label><input name="motivo" class="form-control" placeholder="Ej. error de caja, devolución..." required></div>
+<button class="btn btn-danger"><i class="bi bi-x-circle"></i> Confirmar anulación</button>
+<a href="{% url 'venta_list' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+</div></div>
+{% endblock %}

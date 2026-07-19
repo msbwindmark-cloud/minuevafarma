@@ -19,7 +19,10 @@
             <div class="navbar-nav ms-auto">
                 <a class="nav-link" href="{% url 'dashboard' %}"><i class="bi bi-house"></i> Inicio</a>
                 <a class="nav-link" href="{% url 'producto_list' %}"><i class="bi bi-box-seam"></i> Productos</a>
-                <a class="nav-link" href="{% url 'venta_list' %}"><i class="bi bi-receipt"></i> Ventas</a>
+                <a class="nav-link" href="{% url 'venta_list' %}"><i class="bi 
+bi-receipt"></i> Ventas</a>
+                <a class="nav-link" href="{% url 'caja' %}"><i class="bi 
+bi-cash-stack"></i> Caja</a>
                 <a class="nav-link" href="{% url 'empleado_list' %}"><i class="bi bi-people"></i> Empleados</a>
                 <a class="nav-link" href="{% url 'offline_app' %}"><i class="bi bi-wifi"></i> App Offline</a>
                 <span class="nav-item text-white me-3 mt-2">{{ user.nombre_completo }}</span>
@@ -106,6 +109,9 @@
             if ($.fn.DataTable) {
                 $('table.datatable').each(function(){
                     if (!$.fn.DataTable.isDataTable(this)) {
+                        $(this).find('tbody tr').each(function(){
+                            if ($(this).find('td[colspan]').length) { $(this).remove(); }
+                        });
                         $(this).DataTable({
                             pageLength: 5,
                             lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, 'Todos']],

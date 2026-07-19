@@ -8,7 +8,8 @@ from decimal import Decimal
 from farmacia.models import Producto, Venta, DetalleVenta, Empleado, Auditoria, MovimientoStock
 from farmacia.interacciones import chequear
 from farmacia.sugerencias import sugerir
-from farmacia.models import Cliente, Venta, DetalleVenta
+from farmacia.models import Cliente, Venta, DetalleVenta, Recordatorio
+from farmacia.notificaciones import crear_recordatorios_venta, enviar_recordatorio
 
 
 def _enviar_notificaciones(venta, request):
@@ -62,6 +63,16 @@ def _procesar(carrito, data, request):
                                       stock_resultante=p.stock_actual, motivo="Venta offline " + codigo, usuario=usuario)
     Auditoria.objects.create(accion="CREATE", modelo="Venta", objeto_id=str(venta.id),
                             descripcion="Venta offline " + codigo + " total " + str(total), usuario=usuario)
+    try:
+        crear_recordatorios_venta(venta)
+        for r in Recordatorio.objects.filter(cliente_email=venta.cliente_email, enviado=False) if venta.cliente_email else []:
+            if enviar_recordatorio(r):
+                r.enviado = True
+                from django.utils import timezone as _tz
+                r.fecha_envio = _tz.now()
+                r.save()
+    except Exception:
+        pass
     try:
         _enviar_notificaciones(venta, request)
     except Exception as e:

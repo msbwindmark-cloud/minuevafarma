@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Arqueo de caja{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li><li class="breadcrumb-item active">Caja</li></ol></nav>
+<h2 class="mb-3"><i class="bi bi-cash-stack"></i> Arqueo de caja</h2>
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card text-bg-success shadow"><div class="card-body"><h6>Efectivo</h6><h3>{{ efectivo|floatformat:2 }} €</h3></div></div></div>
+    <div class="col-md-3"><div class="card text-bg-primary shadow"><div class="card-body"><h6>Tarjeta</h6><h3>{{ tarjeta|floatformat:2 }} €</h3></div></div></div>
+    <div class="col-md-3"><div class="card text-bg-secondary shadow"><div class="card-body"><h6>Mixto</h6><h3>{{ mixto|floatformat:2 }} €</h3></div></div></div>
+    <div class="col-md-3"><div class="card text-bg-dark shadow"><div class="card-body"><h6>Total hoy ({{ num }} ventas)</h6><h3>{{ total|floatformat:2 }} €</h3></div></div></div>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-4"><div class="card border shadow"><div class="card-body"><h6>Fondo inicial</h6><h4>{{ fondo|floatformat:2 }} €</h4></div></div></div>
+    <div class="col-md-4"><div class="card border shadow"><div class="card-body"><h6>Efectivo esperado (fondo + ventas)</h6><h4>{{ esperado|floatformat:2 }} €</h4></div></div></div>
+    <div class="col-md-4"><div class="card border shadow"><div class="card-body"><h6>Diferencia sugerida</h6><h4>{{ esperado|floatformat:2 }} €</h4></div></div></div>
+</div>
+<div class="d-flex flex-wrap gap-2 mb-4 align-items-end">
+    <form method="post" action="{% url 'caja_abrir' %}" class="d-flex gap-2 align-items-end">{% csrf_token %}
+        <div><label class="form-label small mb-0">Fondo inicial (€)</label><input type="number" step="0.01" min="0" name="fondo_inicial" class="form-control" style="width:140px;" placeholder="0.00"></div>
+        <button class="btn btn-outline-success"><i class="bi bi-unlock"></i> Abrir caja</button>
+    </form>
+    <form method="post" action="{% url 'caja' %}" class="d-flex gap-2 align-items-end">{% csrf_token %}
+        <div><label class="form-label small mb-0">Observaciones</label><input name="notas" class="form-control" placeholder="Cierre de caja..."></div>
+        <button class="btn btn-danger"><i class="bi bi-lock"></i> Cerrar caja</button>
+    </form>
+    {% if apertura %}<span class="badge bg-success align-self-center"><i class="bi bi-check-circle"></i> Caja abierta (fondo {{ fondo|floatformat:2 }} €)</span>{% endif %}
+</div>
+<div class="card shadow"><div class="card-header"><i class="bi bi-clock-history"></i> Últimos movimientos de caja</div>
+<div class="card-body p-0"><table class="table table-sm mb-0 datatable"><thead class="table-light"><tr><th>Fecha</th><th>Tipo</th><th>Fondo</th><th>Efectivo</th><th>Tarjeta</th><th>Total</th><th>Usuario</th></tr></thead>
+<tbody>{% for c in ultimos %}<tr><td>{{ c.fecha|date:"d/m/Y H:i" }}</td><td><span class="badge {% if c.tipo == 'CIERRE' %}bg-danger{% else %}bg-success{% endif %}">{{ c.get_tipo_display }}</span></td><td>{{ c.fondo_inicial|floatformat:2 }} €</td><td>{{ c.efectivo|floatformat:2 }} €</td><td>{{ c.tarjeta|floatformat:2 }} €</td><td>{{ c.total|floatformat:2 }} €</td><td>{% if c.usuario %}{{ c.usuario }}{% else %}-{% endif %}</td></tr>{% empty %}<tr><td>Sin registros</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}
