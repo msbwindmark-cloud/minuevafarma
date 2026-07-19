@@ -135,6 +135,40 @@
         </div>
     </div>
 </div>
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card shadow h-100">
+            <div class="card-header"><i class="bi bi-people"></i> KPIs por empleado (30 días)</div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-hover datatable mb-0 align-middle" style="width:100%">
+                    <thead class="table-light"><tr><th>Empleado</th><th class="text-center">Ventas</th><th class="text-end">Facturación</th><th class="text-end">Ticket medio</th></tr></thead>
+                    <tbody>
+                    {% for k in kpis_empleado %}
+                        <tr><td>{{ k.nombre }}</td><td class="text-center">{{ k.n }}</td><td class="text-end">{{ k.fact|floatformat:2 }} €</td><td class="text-end">{{ k.ticket|floatformat:2 }} €</td></tr>
+                    {% empty %}<tr><td colspan="4" class="text-center text-muted">Sin datos</td></tr>{% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow h-100">
+            <div class="card-header"><i class="bi bi-graph-up-arrow"></i> Predicción de stock (30 días)</div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-hover datatable mb-0 align-middle" style="width:100%">
+                    <thead class="table-light"><tr><th>Producto</th><th class="text-center">Stock</th><th class="text-center">Ritmo/día</th><th class="text-center">Días restantes</th></tr></thead>
+                    <tbody>
+                    {% for p in prediccion %}
+                        <tr class="{% if p.dias <= 7 %}table-danger{% elif p.dias <= 14 %}table-warning{% endif %}">
+                            <td>{{ p.nombre }}</td><td class="text-center">{{ p.stock }}</td><td class="text-center">{{ p.ritmo }}</td><td class="text-center">{% if p.dias == '>30' %}<span class="badge bg-success">>30</span>{% elif p.dias <= 7 %}<span class="badge bg-danger">{{ p.dias }} días</span>{% elif p.dias <= 14 %}<span class="badge bg-warning text-dark">{{ p.dias }} días</span>{% else %}<span class="badge bg-secondary">{{ p.dias }} días</span>{% endif %}</td>
+                        </tr>
+                    {% empty %}<tr><td colspan="4" class="text-center text-muted">Sin datos</td></tr>{% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="mb-4 d-flex gap-2 flex-wrap">
     <span class="align-self-center text-muted small">Exportar alertas:</span>
     <a href="{% url 'export_alertas' 'pdf' %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-file-earmark-pdf"></i> PDF</a>

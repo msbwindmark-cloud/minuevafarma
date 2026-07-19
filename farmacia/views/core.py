@@ -45,6 +45,24 @@ def dashboard(request):
         unidades=Sum('cantidad'), ingreso=Sum('subtotal')).order_by('-ingreso')[:6]
     labels_top = [t['producto__nombre'] for t in top]
     ingreso_top = [float(t['ingreso']) for t in top]
+    from django.db.models import ExpressionWrapper, FloatField, Value
+    kpis_empleado = list(
+        ventas.values('empleado__usuario__first_name', 'empleado__usuario__last_name')
+        .annotate(n=Count('id'), fact=Sum('total'))
+        .order_by('-fact')[:10])
+    for k in kpis_empleado:
+        nom = (k['empleado__usuario__first_name'] or '') + ' ' + (k['empleado__usuario__last_name'] or '')
+        k['nombre'] = nom.strip() or 'Sin empleado'
+        k['fact'] = float(k['fact'] or 0)
+        k['ticket'] = round(k['fact'] / k['n'], 2) if k['n'] else 0
+    dias_total = 30
+    prediccion = []
+    for p in stock_bajo_list[:10]:
+        vendidas = DetalleVenta.objects.filter(producto=p, venta__in=ventas).aggregate(s=Sum('cantidad'))['s'] or 0
+        ritmo = float(vendidas) / dias_total
+        dias_restantes = int(p.stock_actual / ritmo) if ritmo > 0 else 999
+        prediccion.append({'nombre': p.nombre, 'stock': p.stock_actual, 'ritmo': round(ritmo, 2),
+                           'dias': dias_restantes if dias_restantes != 999 else '>30'})
     graficos = {
         'labels_dia': labels_dia, 'totales_dia': totales_dia,
         'labels_metodo': labels_metodo, 'totales_metodo': totales_metodo,
@@ -53,7 +71,8 @@ def dashboard(request):
     }
     return render(request, 'farmacia/dashboard.html',
                   {'stats': stats, 'ultimos_logs': ultimos_logs, 'graficos': graficos,
-                   'caducados': caducados, 'por_caducar': por_caducar, 'stock_bajo_list': stock_bajo_list})
+                   'caducados': caducados, 'por_caducar': por_caducar, 'stock_bajo_list': stock_bajo_list,
+                   'kpis_empleado': kpis_empleado, 'prediccion': prediccion})
 
 
 @login_required
