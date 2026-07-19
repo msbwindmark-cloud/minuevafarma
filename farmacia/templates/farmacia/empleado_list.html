@@ -1,0 +1,28 @@
+﻿{% extends "base.html" %}
+{% block title %}Empleados{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li><li class="breadcrumb-item active">Empleados</li></ol></nav>
+<div class="d-flex justify-content-between mb-3"><h2><i class="bi bi-people"></i> Empleados</h2>
+<a href="{% url 'empleado_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Nuevo</a></div>
+<div class="alert alert-info"><i class="bi bi-clock-history"></i> Fichajes hoy: <strong>{{ fichajes_hoy }}</strong> · <a href="{% url 'fichaje_list' %}">Ver historial</a></div>
+<div class="card shadow"><div class="card-body p-0">
+<table class="table mb-0"><thead class="table-light"><tr><th>Nombre</th><th>DNI</th><th>Puesto</th><th>Activo</th><th></th></tr></thead>
+<tbody>{% for e in emps %}<tr><td>{{ e.nombre }} {{ e.apellidos }}</td><td>{{ e.dni }}</td><td>{{ e.get_puesto_display }}</td>
+<td>{% if e.activo %}<i class="bi bi-check-circle text-success"></i>{% else %}<i class="bi bi-x-circle text-danger"></i>{% endif %}</td>
+<td class="text-end">
+<button class="btn btn-sm btn-outline-success fichar-btn" data-id="{{ e.pk }}"><i class="bi bi-box-arrow-in-right"></i> Fichar</button>
+<a href="{% url 'empleado_update' e.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+<a href="{% url 'empleado_delete' e.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a></td></tr>{% empty %}<tr><td colspan="5" class="text-center">Sin empleados</td></tr>{% endfor %}</tbody></table>
+</div></div>
+{% endblock %}
+{% block extra_js %}
+<script>
+$('.fichar-btn').on('click', function(){
+    var btn = $(this);
+    $.post("{% url 'fichar' %}", {empleado: btn.data('id'), csrfmiddlewaretoken: '{{ csrf_token }}'}, function(r){
+        if(r.ok){ toastr.success(r.msg); setTimeout(function(){ location.reload(); }, 800); }
+        else { toastr.error(r.msg); }
+    });
+});
+</script>
+{% endblock %}

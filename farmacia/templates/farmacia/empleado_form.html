@@ -1,0 +1,23 @@
+﻿{% extends "base.html" %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li><li class="breadcrumb-item"><a href="{% url 'empleado_list' %}">Empleados</a></li><li class="breadcrumb-item active">{{ titulo }}</li></ol></nav>
+<h2 class="mb-3">{{ titulo }}</h2>
+<div class="card shadow"><div class="card-body">
+<form method="post" enctype="multipart/form-data">{% csrf_token %}
+<div class="row">
+<div class="col-md-6 mb-3">{{ form.usuario.label_tag }}{{ form.usuario }}</div>
+<div class="col-md-3 mb-3">{{ form.nombre.label_tag }}{{ form.nombre }}</div>
+<div class="col-md-3 mb-3">{{ form.apellidos.label_tag }}{{ form.apellidos }}</div>
+<div class="col-md-4 mb-3">{{ form.dni.label_tag }}{{ form.dni }}</div>
+<div class="col-md-4 mb-3">{{ form.puesto.label_tag }}{{ form.puesto }}</div>
+<div class="col-md-4 mb-3">{{ form.telefono.label_tag }}{{ form.telefono }}</div>
+<div class="col-md-6 mb-3">{{ form.email.label_tag }}{{ form.email }}</div>
+<div class="col-md-6 mb-3">{{ form.fecha_alta.label_tag }}{{ form.fecha_alta }}</div>
+<div class="col-md-12">{{ form.activo.label_tag }} {{ form.activo }}</div>
+</div>
+<button type="submit" class="btn btn-primary">Guardar</button>
+<a href="{% url 'empleado_list' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+</div></div>
+{% endblock %}

@@ -28,4 +28,11 @@ urlpatterns = [
     path('proveedores/nuevo/', views.proveedor_create, name='proveedor_create'),
     path('proveedores/<int:pk>/editar/', views.proveedor_update, name='proveedor_update'),
     path('proveedores/<int:pk>/eliminar/', views.proveedor_delete, name='proveedor_delete'),
+
+    path('empleados/', views.empleado_list, name='empleado_list'),
+    path('empleados/nuevo/', views.empleado_create, name='empleado_create'),
+    path('empleados/<uuid:pk>/editar/', views.empleado_update, name='empleado_update'),
+    path('empleados/<uuid:pk>/eliminar/', views.empleado_delete, name='empleado_delete'),
+    path('fichar/', views.fichar, name='fichar'),
+    path('fichajes/', views.fichaje_list, name='fichaje_list'),
 ]

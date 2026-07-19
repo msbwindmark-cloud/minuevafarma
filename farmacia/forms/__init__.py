@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
-from farmacia.models import Rol
+from farmacia.models import Rol, Empleado
 
 Usuario = get_user_model()
 
@@ -143,4 +143,20 @@ class MovimientoForm(forms.ModelForm):
             'tipo': forms.Select(attrs={'class': 'form-control'}),
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
             'motivo': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+class EmpleadoForm(forms.ModelForm):
+    class Meta:
+        model = Empleado
+        fields = ['usuario', 'nombre', 'apellidos', 'dni', 'puesto', 'telefono', 'email', 'fecha_alta', 'activo']
+        widgets = {
+            'usuario': forms.Select(attrs={'class': 'form-control'}),
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'apellidos': forms.TextInput(attrs={'class': 'form-control'}),
+            'dni': forms.TextInput(attrs={'class': 'form-control'}),
+            'puesto': forms.Select(attrs={'class': 'form-control'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'fecha_alta': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'activo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }

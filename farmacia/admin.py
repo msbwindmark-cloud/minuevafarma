@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from farmacia.models import Usuario, Rol, Auditoria
+from farmacia.models import Usuario, Rol, Auditoria, Empleado, Fichaje
 
 
 @admin.register(Rol)
@@ -35,3 +35,18 @@ class AuditoriaAdmin(admin.ModelAdmin):
     search_fields = ['descripcion', 'ip']
     readonly_fields = [f.name for f in Auditoria._meta.fields]
     date_hierarchy = 'fecha'
+
+
+@admin.register(Empleado)
+class EmpleadoAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'apellidos', 'dni', 'puesto', 'activo', 'fecha_alta']
+    list_filter = ['puesto', 'activo']
+    search_fields = ['nombre', 'apellidos', 'dni']
+
+
+@admin.register(Fichaje)
+class FichajeAdmin(admin.ModelAdmin):
+    list_display = ['empleado', 'entrada', 'salida', 'ip']
+    list_filter = ['entrada']
+    search_fields = ['empleado__nombre', 'empleado__apellidos']
+    date_hierarchy = 'entrada'

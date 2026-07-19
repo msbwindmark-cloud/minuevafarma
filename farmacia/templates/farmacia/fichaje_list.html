@@ -1,0 +1,18 @@
+﻿{% extends "base.html" %}
+{% block title %}Fichajes{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li><li class="breadcrumb-item"><a href="{% url 'empleado_list' %}">Empleados</a></li><li class="breadcrumb-item active">Fichajes</li></ol></nav>
+<h2 class="mb-3"><i class="bi bi-clock-history"></i> Historial de fichajes</h2>
+<div class="card shadow"><div class="card-body p-0">
+<table class="table table-sm mb-0"><thead class="table-light"><tr><th>Empleado</th><th>Entrada</th><th>Salida</th><th>Duracion</th><th>IP</th></tr></thead>
+<tbody>
+{% for f in fichajes %}
+<tr><td>{{ f.empleado }}</td><td>{{ f.entrada|date:"d/m/Y H:i" }}</td>
+<td>{% if f.salida %}{{ f.salida|date:"d/m/Y H:i" }}{% else %}<span class="badge bg-warning">En turno</span>{% endif %}</td>
+<td>{{ f.duracion }}</td><td>{{ f.ip|default:"-" }}</td></tr>
+{% empty %}
+<tr><td colspan="5" class="text-center">Sin fichajes</td></tr>
+{% endfor %}
+</tbody></table>
+</div></div>
+{% endblock %}

@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
-from farmacia.models import Producto, MovimientoStock, Auditoria, Categoria, Proveedor
+from farmacia.models import Producto, MovimientoStock, Auditoria, Categoria, Proveedor, Empleado, Fichaje
 
 
 @receiver(pre_save, sender=Producto)
@@ -50,3 +50,20 @@ def _proveedor_post_save(sender, instance, created, **kwargs):
     Auditoria.objects.create(
         accion='CREATE' if created else 'UPDATE', modelo='Proveedor',
         objeto_id=str(instance.id), descripcion=f"Proveedor: {instance.nombre}")
+
+
+@receiver(post_save, sender=Empleado)
+def _empleado_post_save(sender, instance, created, **kwargs):
+    Auditoria.objects.create(
+        accion='CREATE' if created else 'UPDATE', modelo='Empleado',
+        objeto_id=str(instance.id), descripcion=f"Empleado: {instance.nombre} {instance.apellidos}")
+
+
+@receiver(post_save, sender=Fichaje)
+def _fichaje_post_save(sender, instance, created, **kwargs):
+    accion = 'CREATE' if created else 'UPDATE'
+    descripcion = f"Fichaje {'entrada' if created else 'actualizacion'} de {instance.empleado}"
+    if instance.salida and not created:
+        descripcion = f"Fichaje salida de {instance.empleado}"
+    Auditoria.objects.create(accion=accion, modelo='Fichaje',
+        objeto_id=str(instance.id), descripcion=descripcion)
