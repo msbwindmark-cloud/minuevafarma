@@ -6,7 +6,7 @@
 <a href="{% url 'empleado_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Nuevo</a></div>
 <div class="alert alert-info"><i class="bi bi-clock-history"></i> Fichajes hoy: <strong>{{ fichajes_hoy }}</strong> · <a href="{% url 'fichaje_list' %}">Ver historial</a></div>
 <div class="card shadow"><div class="card-body p-0">
-<table class="table mb-0"><thead class="table-light"><tr><th>Nombre</th><th>DNI</th><th>Puesto</th><th>Activo</th><th></th></tr></thead>
+<table class="table mb-0 datatable"<thead class="table-light"><tr><th>Nombre</th><th>DNI</th><th>Puesto</th><th>Activo</th><th></th></tr></thead>
 <tbody>{% for e in emps %}<tr><td>{{ e.nombre }} {{ e.apellidos }}</td><td>{{ e.dni }}</td><td>{{ e.get_puesto_display }}</td>
 <td>{% if e.activo %}<i class="bi bi-check-circle text-success"></i>{% else %}<i class="bi bi-x-circle text-danger"></i>{% endif %}</td>
 <td class="text-end">

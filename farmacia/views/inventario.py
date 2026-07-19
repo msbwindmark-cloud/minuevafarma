@@ -6,6 +6,7 @@ from django.db.models import Q
 
 from farmacia.models import Producto, Categoria, Proveedor, MovimientoStock, Auditoria
 from farmacia.forms import ProductoForm, CategoriaForm, ProveedorForm, MovimientoForm
+from farmacia.cima import ficha_resumida
 
 
 def _ip(request):
@@ -200,3 +201,17 @@ def proveedor_delete(request, pk):
         return redirect('proveedor_list')
     return render(request, 'farmacia/categoria_confirm_delete.html',
                   {'obj': prov, 'tipo': 'proveedor', 'back': 'proveedor_list'})
+
+
+@login_required
+def producto_ficha(request, pk):
+    producto = get_object_or_404(Producto, pk=pk)
+    ficha = None
+    error = None
+    try:
+        ficha = ficha_resumida(producto.cn if producto.cn else producto.nombre)
+    except Exception as e:
+        error = "No se pudo consultar CIMA: " + str(e)
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return render(request, "farmacia/_ficha_cima.html", {"ficha": ficha, "error": error, "producto": producto})
+    return render(request, "farmacia/producto_ficha.html", {"ficha": ficha, "error": error, "producto": producto})

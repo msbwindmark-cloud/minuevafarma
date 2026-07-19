@@ -1,0 +1,23 @@
+{% if error %}<div class="alert alert-warning">{{ error }}</div>{% endif %}
+{% if ficha %}
+<div class="row">
+  <div class="col-md-4 text-center">
+    {% if ficha.foto %}<img src="{{ ficha.foto }}" class="img-fluid rounded"><br>{% endif %}
+    {% if ficha.receta %}<span class="badge bg-danger mt-2">Con receta</span>{% else %}<span class="badge bg-success mt-2">Sin receta</span>{% endif %}
+  </div>
+  <div class="col-md-8">
+    <p><strong>Laboratorio:</strong> {{ ficha.labtitular }}</p>
+    <p><strong>Principio activo:</strong> {{ ficha.principio_activo }}</p>
+    <p><strong>Forma:</strong> {{ ficha.forma }} | <strong>Dosis:</strong> {{ ficha.dosis }}</p>
+    <p><strong>Via:</strong> {{ ficha.via_administracion }}</p>
+    {% if ficha.composicion %}<p><strong>Composicion:</strong> {{ ficha.composicion }}</p>{% endif %}
+    {% if ficha.indicaciones %}<p><strong>Indicaciones:</strong> {{ ficha.indicaciones }}</p>{% endif %}
+    <div class="mt-2">
+      {% if ficha.prospecto_html %}<a href="{{ ficha.prospecto_html }}" target="_blank" class="btn btn-primary btn-sm">Prospecto</a>{% endif %}
+      {% if ficha.ft_html %}<a href="{{ ficha.ft_html }}" target="_blank" class="btn btn-secondary btn-sm">Ficha tecnica</a>{% endif %}
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="alert alert-info">No se encontro informacion en CIMA. Rellena el Codigo Nacional en el producto.</div>
+{% endif %}

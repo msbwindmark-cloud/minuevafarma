@@ -18,6 +18,7 @@ urlpatterns = [
     path('productos/<uuid:pk>/editar/', views.producto_update, name='producto_update'),
     path('productos/<uuid:pk>/eliminar/', views.producto_delete, name='producto_delete'),
     path('productos/<uuid:pk>/movimiento/', views.producto_movimiento, name='producto_movimiento'),
+    path('productos/<uuid:pk>/ficha/', views.producto_ficha, name='producto_ficha'),
     path('movimientos/', views.movimiento_list, name='movimiento_list'),
 
     path('categorias/', views.categoria_list, name='categoria_list'),

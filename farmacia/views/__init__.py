@@ -2,7 +2,7 @@
                      password_reset_request, password_reset_confirm, perfil, toggle_2fa)
 from .core import dashboard, auditoria_list
 from .inventario import (producto_list, producto_create, producto_update,
-                         producto_delete, producto_movimiento, movimiento_list,
+                          producto_delete, producto_movimiento, movimiento_list, producto_ficha,
                          categoria_list, categoria_create, categoria_update, categoria_delete,
                          proveedor_list, proveedor_create, proveedor_update, proveedor_delete)
 from .empleados import (empleado_list, empleado_create, empleado_update,
@@ -12,7 +12,7 @@ __all__ = ['registro', 'login_view', 'logout_view', 'verificar_2fa',
            'password_reset_request', 'password_reset_confirm', 'perfil', 'toggle_2fa',
            'dashboard', 'auditoria_list',
            'producto_list', 'producto_create', 'producto_update', 'producto_delete',
-           'producto_movimiento', 'movimiento_list',
+            'producto_movimiento', 'movimiento_list', 'producto_ficha',
            'categoria_list', 'categoria_create', 'categoria_update', 'categoria_delete',
            'proveedor_list', 'proveedor_create', 'proveedor_update', 'proveedor_delete',
            'empleado_list', 'empleado_create', 'empleado_update', 'empleado_delete',

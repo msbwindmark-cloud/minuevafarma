@@ -46,6 +46,7 @@ class Producto(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     codigo = models.CharField(max_length=40, unique=True, verbose_name="Código/Nacional")
+    cn = models.CharField(max_length=20, blank=True, verbose_name="Código Nacional (CIMA)")
     nombre = models.CharField(max_length=150, verbose_name="Nombre")
     descripcion = models.TextField(blank=True, verbose_name="Descripción")
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True, related_name='productos')

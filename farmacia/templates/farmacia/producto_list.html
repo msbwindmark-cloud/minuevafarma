@@ -18,7 +18,7 @@
 </form>
 <div class="card shadow">
     <div class="card-body p-0">
-        <table class="table table-hover mb-0">
+        <table class="table table-hover mb-0 datatable" id="tablaProductos">
             <thead class="table-light">
                 <tr><th>Código</th><th>Nombre</th><th>Categorí­a</th><th>Ubicación</th><th class="text-end">Stock</th><th class="text-end">P. venta</th><th></th></tr>
             </thead>
@@ -32,6 +32,7 @@
                     <td class="text-end">{{ p.stock_actual }}</td>
                     <td class="text-end">{{ p.precio_venta }} â‚¬</td>
                     <td class="text-end">
+                        <button class="btn btn-sm btn-outline-success" title="Ficha técnica CIMA" onclick="verFicha('{{ p.pk }}')"><i class="bi bi-capsule-pill"></i></button>
                         <a href="{% url 'producto_movimiento' p.pk %}" class="btn btn-sm btn-outline-info" title="Movimiento"><i class="bi bi-arrow-left-right"></i></a>
                         <a href="{% url 'producto_update' p.pk %}" class="btn btn-sm btn-outline-primary" title="Editar"><i class="bi bi-pencil"></i></a>
                         <a href="{% url 'producto_delete' p.pk %}" class="btn btn-sm btn-outline-danger" title="Eliminar"><i class="bi bi-trash"></i></a>
@@ -44,4 +45,23 @@
         </table>
     </div>
 </div>
+<div class="modal fade" id="modalFicha" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white"><h5 class="modal-title"><i class="bi bi-capsule-pill"></i> Ficha técnica (CIMA/AEMPS)</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body" id="cuerpoFicha"><div class="text-center"><div class="spinner-border"></div> Consultando CIMA...</div></div>
+    </div>
+  </div>
+</div>
+<script>
+function verFicha(pk){
+  var m = new bootstrap.Modal(document.getElementById('modalFicha'));
+  document.getElementById('cuerpoFicha').innerHTML = '<div class="text-center"><div class="spinner-border"></div> Consultando CIMA...</div>';
+  m.show();
+  fetch('/productos/' + pk + '/ficha/', {headers:{'x-requested-with':'XMLHttpRequest'}})
+    .then(r=>r.text()).then(h=>{ document.getElementById('cuerpoFicha').innerHTML = h; })
+    .catch(()=>{ document.getElementById('cuerpoFicha').innerHTML = '<div class="alert alert-danger">Error al consultar CIMA</div>'; });
+}
+</script>
 {% endblock %}
