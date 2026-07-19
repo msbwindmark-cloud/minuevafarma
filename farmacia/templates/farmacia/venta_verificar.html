@@ -1,0 +1,15 @@
+﻿{% extends "base.html" %}
+{% block title %}Verificar ticket{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-4"><div class="col-md-6">
+<div class="card shadow border-success"><div class="card-body text-center">
+<i class="bi bi-patch-check text-success" style="font-size:3rem;"></i>
+<h4 class="mt-2">Ticket verificado</h4>
+<p><strong>{{ venta.codigo }}</strong></p>
+<p>{{ venta.fecha|date:"d/m/Y H:i" }}</p>
+<p>Total: <strong>{{ venta.total }} EUR</strong></p>
+<p>Atendido por: {% if venta.empleado %}{{ venta.empleado }}{% else %}-{% endif %}</p>
+<p class="text-muted">Este ticket es auténtico y fue registrado en el sistema.</p>
+</div></div>
+</div></div>
+{% endblock %}

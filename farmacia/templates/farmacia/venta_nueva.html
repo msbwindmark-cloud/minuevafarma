@@ -1,0 +1,64 @@
+﻿{% extends "base.html" %}
+{% block title %}Nueva venta{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li><li class="breadcrumb-item active">Nueva venta</li></ol></nav>
+<h2 class="mb-3"><i class="bi bi-cart-check"></i> Nueva venta</h2>
+<div class="row">
+<div class="col-md-7">
+<div class="card shadow"><div class="card-header">Productos</div><div class="card-body">
+<form method="post" id="addForm">{% csrf_token %}
+<div class="input-group mb-2"><select name="producto" class="form-control">{% for p in productos %}<option value="{{ p.pk }}">{{ p.nombre }} ({{ p.precio_venta }} EUR) - stock {{ p.stock_actual }}</option>{% endfor %}</select>
+<input type="number" name="cantidad" value="1" min="1" class="form-control" style="max-width:90px;"><button class="btn btn-primary">Añadir</button></div>
+</form>
+</div></div>
+<div class="col-md-5">
+<div class="card shadow"><div class="card-header">Carrito</div><div class="card-body">
+{% if carrito %}<ul class="list-group mb-2">{% for i in carrito %}<li class="list-group-item d-flex justify-content-between">{{ i.nombre }} x{{ i.cantidad }} <span>{{ i.subtotal }} EUR <a href="{% url 'venta_quitar' i.id %}"><i class="bi bi-x-circle text-danger"></i></a></span></li>{% endfor %}</ul>
+<h5>Total: {{ total }} EUR</h5>
+{% else %}<p class="text-muted">Carrito vacío.</p>{% endif %}
+</div></div>
+</div>
+</div>
+<div class="card shadow mt-3"><div class="card-body">
+<form method="post">{% csrf_token %}
+<div class="row">
+<div class="col-md-4 mb-3">{{ form.cliente_nombre.label_tag }}{{ form.cliente_nombre }}</div>
+<div class="col-md-4 mb-3">{{ form.cliente_telefono.label_tag }}{{ form.cliente_telefono }}</div>
+<div class="col-md-4 mb-3">{{ form.cliente_email.label_tag }}{{ form.cliente_email }}</div>
+<div class="col-md-4 mb-3">{{ form.metodo_pago.label_tag }}{{ form.metodo_pago }}</div>
+<div class="col-md-4 mb-3">{{ form.entregado.label_tag }}{{ form.entregado }}</div>
+<div class="col-md-8 mb-3">{{ form.notas.label_tag }}{{ form.notas }}</div>
+</div>
+<button type="submit" class="btn btn-success"><i class="bi bi-check-lg"></i> Cobrar y generar ticket</button>
+</form>
+</div></div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+  var btn = document.querySelector("button[type=submit]");
+  if(btn){
+    btn.addEventListener("click", function(e){
+      if(!navigator.onLine){
+        e.preventDefault(); e.stopPropagation();
+        var f = btn.closest("form");
+        var fd = new FormData(f);
+        var datos = {};
+        fd.forEach(function(v,k){ datos[k]=v; });
+        datos._offline = 1;
+        if(window.MiFarmaOffline){
+          window.MiFarmaOffline.guardarVentaOffline(datos).then(function(){
+            toastr.warning("Sin conexion: venta guardada en modo offline. Se sincronizara al reconectar.");
+            setTimeout(function(){ location.href="/ventas/"; }, 1500);
+          });
+        }
+      }
+    });
+  }
+});
+$("#addForm").on("submit", function(e){
+  e.preventDefault();
+  $.post("{% url 'venta_agregar' %}", $(this).serialize() + "&csrfmiddlewaretoken={{ csrf_token }}", function(){ location.reload(); });
+});
+</script>
+{% endblock %}

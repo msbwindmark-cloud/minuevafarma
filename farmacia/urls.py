@@ -35,4 +35,17 @@ urlpatterns = [
     path('empleados/<uuid:pk>/eliminar/', views.empleado_delete, name='empleado_delete'),
     path('fichar/', views.fichar, name='fichar'),
     path('fichajes/', views.fichaje_list, name='fichaje_list'),
+
+    path('ventas/', views.venta_list, name='venta_list'),
+    path('ventas/nueva/', views.venta_nueva, name='venta_nueva'),
+    path('ventas/agregar/', views.venta_agregar, name='venta_agregar'),
+    path('ventas/quitar/<uuid:pid>/', views.venta_quitar, name='venta_quitar'),
+    path('ventas/ticket/<uuid:pk>/', views.venta_ticket, name='venta_ticket'),
+    path('ventas/ticket/pdf/<uuid:pk>/', views.venta_ticket_pdf, name='venta_ticket_pdf'),
+    path('ventas/enviar/<uuid:pk>/', views.venta_enviar, name='venta_enviar'),
+    path('ticket/verificar/<uuid:pk>/', views.venta_verificar, name='venta_verificar'),
+    path('api/venta/offline/', views.venta_offline, name='venta_offline'),
+    path('api/login/', views.api_login, name='api_login'),
+    path('api/productos/', views.api_productos, name='api_productos'),
+    path('offline/', views.offline_app, name='offline_app'),
 ]

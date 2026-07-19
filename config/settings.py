@@ -1,4 +1,4 @@
-"""
+﻿"""
 Django settings for config project.
 """
 
@@ -106,3 +106,8 @@ EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='no-reply@minuevafarma.com')
 
 AUDIT_LOGIN_ATTEMPTS = True
+# Twilio (dejar vacio para modo simulado)
+TWILIO_ACCOUNT_SID = env('TWILIO_ACCOUNT_SID', default='')
+TWILIO_AUTH_TOKEN = env('TWILIO_AUTH_TOKEN', default='')
+TWILIO_FROM_NUMBER = env('TWILIO_FROM_NUMBER', default='')
+

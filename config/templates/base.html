@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -18,10 +18,15 @@
             <div class="navbar-nav ms-auto">
                 <a class="nav-link" href="{% url 'dashboard' %}"><i class="bi bi-house"></i> Inicio</a>
                 <a class="nav-link" href="{% url 'producto_list' %}"><i class="bi bi-box-seam"></i> Productos</a>
+                <a class="nav-link" href="{% url 'venta_list' %}"><i class="bi bi-receipt"></i> Ventas</a>
                 <a class="nav-link" href="{% url 'empleado_list' %}"><i class="bi bi-people"></i> Empleados</a>
+                <a class="nav-link" href="{% url 'offline_app' %}"><i class="bi bi-wifi"></i> App Offline</a>
                 <span class="nav-item text-white me-3 mt-2">{{ user.nombre_completo }}</span>
+                <button id="btnSync" class="btn btn-warning btn-sm me-2" onclick="sincronizarManual()">
+                    <i class="bi bi-cloud-arrow-up"></i> <span id="syncCount">0</span> pendientes
+                </button>
                 <a class="nav-link" href="{% url 'perfil' %}"><i class="bi bi-person"></i> Perfil</a>
-                <a class="nav-link" href="{% url 'auditoria' %}"><i class="bi bi-shield-check"></i> Auditoría</a>
+                <a class="nav-link" href="{% url 'auditoria' %}"><i class="bi bi-shield-check"></i> Auditoria</a>
                 {% if user.is_superuser %}<a class="nav-link" href="{% url 'admin:index' %}" target="_blank"><i class="bi bi-gear"></i> Admin</a>{% endif %}
                 <a class="nav-link" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Salir</a>
             </div>
@@ -31,10 +36,54 @@
     <main class="container my-4">
         {% block content %}{% endblock %}
     </main>
+    <div id="offlineBar" class="alert alert-warning text-center mb-0 py-1" style="display:none;position:fixed;bottom:0;width:100%;z-index:9999;">
+        <i class="bi bi-wifi-off"></i> <span id="offlineTxt">Sin conexion - modo offline</span>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="/static/pwa/app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js', {scope:'/'}).catch(function(e){ console.log('SW error', e); }); }
+
+        function actualizarEstado() {
+            var b = document.getElementById('offlineBar');
+            var btn = document.getElementById('btnSync');
+            if (b) {
+                b.style.display = navigator.onLine ? 'none' : 'block';
+            }
+            if (!btn) return;
+            if (window.MiFarmaOffline) {
+                window.MiFarmaOffline.ventasPendientes().then(function(lista){
+                    btn.style.display = 'inline-block';
+                    var c = document.getElementById('syncCount');
+                    if (c) c.textContent = lista.length;
+                });
+            } else {
+                btn.style.display = 'inline-block';
+                var c = document.getElementById('syncCount');
+                if (c) c.textContent = '0';
+            }
+        }
+
+        function sincronizarManual() {
+            if (!navigator.onLine) {
+                Swal.fire('Sin conexion', 'Conectate a internet para sincronizar', 'warning');
+                return;
+            }
+            Swal.fire({ title: 'Sincronizando...', text: 'Enviando ventas pendientes', allowOutsideClick: false, didOpen: function(){ Swal.showLoading(); } });
+            window.MiFarmaOffline.sincronizar().then(function(n){
+                Swal.fire('Sincronizado', n + ' venta(s) sincronizada(s) correctamente', 'success').then(function(){ location.reload(); });
+            }).catch(function(){
+                Swal.fire('Error', 'No se pudieron sincronizar las ventas', 'error');
+            });
+        }
+
+        window.addEventListener('online', actualizarEstado);
+        window.addEventListener('offline', actualizarEstado);
+        actualizarEstado();
+    </script>
     <script>
         toastr.options = { closeButton: true, progressBar: true, positionClass: "toast-top-right", timeOut: 4000 };
         {% if messages %}

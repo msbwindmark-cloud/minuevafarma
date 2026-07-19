@@ -160,3 +160,4 @@ class EmpleadoForm(forms.ModelForm):
             'fecha_alta': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'activo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+from farmacia.forms.venta import VentaForm

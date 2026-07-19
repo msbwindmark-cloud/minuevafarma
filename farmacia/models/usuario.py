@@ -67,6 +67,8 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     intentos_fallidos = models.PositiveSmallIntegerField(default=0)
     bloqueado_hasta = models.DateTimeField(blank=True, null=True)
     debe_cambiar_password = models.BooleanField(default=False)
+    token = models.CharField(max_length=64, blank=True)
+    token_expiry = models.DateTimeField(blank=True, null=True)
 
     objects = UsuarioManager()
 
