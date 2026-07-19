@@ -1,6 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from farmacia.models import Usuario, Rol, Auditoria, Empleado, Fichaje
+from farmacia.models import (
+    Usuario, Rol, Auditoria, Empleado, Fichaje,
+    Categoria, Proveedor, Producto, MovimientoStock,
+    Venta, DetalleVenta, Cliente, Recordatorio, Caja,
+    PedidoProveedor, LineaPedido,
+)
 
 
 @admin.register(Rol)
@@ -50,3 +55,94 @@ class FichajeAdmin(admin.ModelAdmin):
     list_filter = ['entrada']
     search_fields = ['empleado__nombre', 'empleado__apellidos']
     date_hierarchy = 'entrada'
+
+
+@admin.register(Categoria)
+class CategoriaAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'activo']
+    list_filter = ['activo']
+    search_fields = ['nombre']
+
+
+@admin.register(Proveedor)
+class ProveedorAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'cif', 'email', 'telefono', 'activo']
+    list_filter = ['activo']
+    search_fields = ['nombre', 'cif', 'email']
+
+
+@admin.register(Producto)
+class ProductoAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'codigo', 'cn', 'categoria', 'proveedor', 'stock_actual', 'stock_minimo', 'precio_venta', 'caducidad', 'activo']
+    list_filter = ['activo', 'categoria', 'proveedor', 'unidad']
+    search_fields = ['nombre', 'codigo', 'cn']
+    readonly_fields = ['creado', 'actualizado']
+
+
+@admin.register(MovimientoStock)
+class MovimientoStockAdmin(admin.ModelAdmin):
+    list_display = ['fecha', 'producto', 'tipo', 'cantidad', 'stock_resultante', 'motivo', 'usuario']
+    list_filter = ['tipo']
+    search_fields = ['producto__nombre', 'motivo']
+    date_hierarchy = 'fecha'
+    readonly_fields = [f.name for f in MovimientoStock._meta.fields]
+
+
+class DetalleVentaInline(admin.TabularInline):
+    model = DetalleVenta
+    extra = 0
+    readonly_fields = ['codigo', 'nombre', 'cantidad', 'precio_unitario', 'subtotal']
+
+
+@admin.register(Venta)
+class VentaAdmin(admin.ModelAdmin):
+    list_display = ['codigo', 'fecha', 'empleado', 'cliente_nombre', 'metodo_pago', 'total', 'anulada']
+    list_filter = ['metodo_pago', 'anulada']
+    search_fields = ['codigo', 'cliente_nombre', 'cliente_email']
+    date_hierarchy = 'fecha'
+    inlines = [DetalleVentaInline]
+
+
+@admin.register(DetalleVenta)
+class DetalleVentaAdmin(admin.ModelAdmin):
+    list_display = ['venta', 'producto', 'nombre', 'cantidad', 'precio_unitario', 'subtotal']
+    search_fields = ['nombre', 'codigo']
+
+
+@admin.register(Cliente)
+class ClienteAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'telefono', 'email', 'puntos', 'fecha_alta']
+    search_fields = ['nombre', 'telefono', 'email']
+    list_filter = ['puntos']
+    readonly_fields = ['fecha_alta']
+
+
+@admin.register(Recordatorio)
+class RecordatorioAdmin(admin.ModelAdmin):
+    list_display = ['tipo', 'cliente_nombre', 'cliente_email', 'producto', 'enviado', 'fecha_envio', 'creado']
+    list_filter = ['tipo', 'enviado']
+    search_fields = ['cliente_nombre', 'cliente_email', 'producto', 'mensaje']
+    readonly_fields = ['creado']
+
+
+@admin.register(Caja)
+class CajaAdmin(admin.ModelAdmin):
+    list_display = ['tipo', 'fecha', 'fondo_inicial', 'efectivo', 'tarjeta', 'total', 'usuario']
+    list_filter = ['tipo']
+    search_fields = ['notas']
+    date_hierarchy = 'fecha'
+    readonly_fields = ['fecha']
+
+
+@admin.register(PedidoProveedor)
+class PedidoProveedorAdmin(admin.ModelAdmin):
+    list_display = ['id', 'proveedor', 'fecha', 'estado', 'creado_por']
+    list_filter = ['estado', 'proveedor']
+    search_fields = ['notas']
+    date_hierarchy = 'fecha'
+
+
+@admin.register(LineaPedido)
+class LineaPedidoAdmin(admin.ModelAdmin):
+    list_display = ['pedido', 'producto', 'cantidad_sugerida', 'cantidad_pedida']
+    search_fields = ['producto__nombre']
