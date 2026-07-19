@@ -2,8 +2,10 @@
 {% block title %}Proveedores{% endblock %}
 {% block content %}
 <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li><li class="breadcrumb-item"><a href="{% url 'producto_list' %}">Productos</a></li><li class="breadcrumb-item active">Proveedores</li></ol></nav>
-<div class="d-flex justify-content-between mb-3"><h2><i class="bi bi-truck"></i> Proveedores</h2>
-<a href="{% url 'proveedor_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Nuevo</a></div>
+<div class="d-flex justify-content-between align-items-center mb-3"><h2 class="mb-0"><i class="bi bi-truck"></i> Proveedores</h2>
+<div class="d-flex gap-2"><a href="{% url 'export_proveedores' 'pdf' %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-file-earmark-pdf"></i> PDF</a>
+<a href="{% url 'export_proveedores' 'excel' %}" class="btn btn-sm btn-outline-success"><i class="bi bi-file-earmark-excel"></i> Excel</a>
+<a href="{% url 'proveedor_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Nuevo</a></div></div>
 <div class="card shadow"><div class="card-body p-0">
 <table class="table mb-0 datatable"><thead class="table-light"><tr><th>Nombre</th><th>CIF</th><th>Email</th><th>Teléfono</th><th></th></tr></thead>
 <tbody>{% for p in provs %}<tr><td>{{ p.nombre }}</td><td>{{ p.cif|default:"-" }}</td><td>{{ p.email|default:"-" }}</td><td>{{ p.telefono|default:"-" }}</td>

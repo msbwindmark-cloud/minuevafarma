@@ -3,7 +3,9 @@
 {% block content %}
 <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li><li class="breadcrumb-item active">Ventas</li></ol></nav>
 <div class="d-flex justify-content-between mb-3"><h2><i class="bi bi-receipt"></i> Ventas</h2>
-<a href="{% url 'venta_nueva' %}" class="btn btn-success btn-sm"><i class="bi bi-plus-lg"></i> Nueva venta</a></div>
+<div class="d-flex gap-2"><a href="{% url 'export_ventas' 'pdf' %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-file-earmark-pdf"></i> PDF</a>
+<a href="{% url 'export_ventas' 'excel' %}" class="btn btn-sm btn-outline-success"><i class="bi bi-file-earmark-excel"></i> Excel</a>
+<a href="{% url 'venta_nueva' %}" class="btn btn-success btn-sm"><i class="bi bi-plus-lg"></i> Nueva venta</a></div></div>
 <div class="card shadow"><div class="card-body p-0">
 <table class="table table-sm mb-0 datatable"><thead class="table-light"><tr><th>Código</th><th>Fecha</th><th>Cliente</th><th>Método</th><th>Total</th><th>Empleado</th><th></th></tr></thead>
 <tbody>{% for v in ventas %}<tr class="{% if v.anulada %}table-secondary{% endif %}"><td>{{ v.codigo }}{% if v.anulada %} <span class="badge bg-dark">Anulada</span>{% endif %}</td><td>{{ v.fecha|date:"d/m/Y H:i" }}</td><td>{{ v.cliente_nombre|default:"-" }}</td><td>{{ v.get_metodo_pago_display }}</td><td>{{ v.total }} EUR</td><td>{% if v.empleado %}{{ v.empleado }}{% else %}-{% endif %}</td>

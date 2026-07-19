@@ -135,6 +135,11 @@
         </div>
     </div>
 </div>
+<div class="mb-4 d-flex gap-2 flex-wrap">
+    <span class="align-self-center text-muted small">Exportar alertas:</span>
+    <a href="{% url 'export_alertas' 'pdf' %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-file-earmark-pdf"></i> PDF</a>
+    <a href="{% url 'export_alertas' 'excel' %}" class="btn btn-sm btn-outline-success"><i class="bi bi-file-earmark-excel"></i> Excel</a>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
 const G = {{ graficos|safe }};

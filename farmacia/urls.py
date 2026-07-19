@@ -4,6 +4,9 @@ from farmacia.views import api as api_views
 from farmacia.views.api_offline import api_producto_detalle
 from farmacia.views import caja_views as views_caja
 from farmacia.views.ventas import venta_anular
+from farmacia.views import export_views as exp
+from farmacia.views.clientes_views import cliente_list as _cliente_list
+
 
 urlpatterns = [
     path('', views.dashboard, name='dashboard'),
@@ -51,6 +54,15 @@ urlpatterns = [
     path('ventas/anular/<uuid:pk>/', venta_anular, name='venta_anular'),
     path('caja/', views_caja.caja_view, name='caja'),
     path('caja/abrir/', views_caja.caja_abrir, name='caja_abrir'),
+    path('export/productos/<str:fmt>/', exp.export_productos, name='export_productos'),
+    path('export/ventas/<str:fmt>/', exp.export_ventas, name='export_ventas'),
+    path('export/clientes/<str:fmt>/', exp.export_clientes, name='export_clientes'),
+    path('export/movimientos/<str:fmt>/', exp.export_movimientos, name='export_movimientos'),
+    path('export/caja/<str:fmt>/', exp.export_caja, name='export_caja'),
+    path('clientes/', _cliente_list, name='cliente_list'),
+    path('export/categorias/<str:fmt>/', exp.export_categorias, name='export_categorias'),
+    path('export/proveedores/<str:fmt>/', exp.export_proveedores, name='export_proveedores'),
+    path('export/alertas/<str:fmt>/', exp.export_alertas, name='export_alertas'),
     path('ticket/verificar/<uuid:pk>/', views.venta_verificar, name='venta_verificar'),
     path('api/venta/offline/', views.venta_offline, name='venta_offline'),
     path('api/login/', views.api_login, name='api_login'),
