@@ -3,7 +3,7 @@
 {% block content %}
 <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li><li class="breadcrumb-item active">Productos</li></ol></nav>
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2><i class="bi bi-box-seam"></i> Productos</h2>
+    <h2><i class="bi bi-box-seam"></i> {{ titulo|default:"Productos" }}</h2>
     <div>
         <a href="{% url 'categoria_list' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-tags"></i> Categorí­as</a>
         <a href="{% url 'proveedor_list' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-truck"></i> Proveedores</a>

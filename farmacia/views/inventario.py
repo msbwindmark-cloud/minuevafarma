@@ -1,8 +1,9 @@
-﻿from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Q, F
+from datetime import timedelta
 
 from farmacia.models import Producto, Categoria, Proveedor, MovimientoStock, Auditoria
 from farmacia.forms import ProductoForm, CategoriaForm, ProveedorForm, MovimientoForm
@@ -17,12 +18,25 @@ def _ip(request):
 @login_required
 def producto_list(request):
     q = request.GET.get('q', '')
+    alerta = request.GET.get('alerta', '')
+    hoy = timezone.now().date()
+    limite = hoy + timedelta(days=30)
     qs = Producto.objects.select_related('categoria', 'proveedor')
+    titulo = 'Productos'
+    if alerta == 'caducado':
+        qs = qs.filter(caducidad__lt=hoy)
+        titulo = 'Productos caducados'
+    elif alerta == 'por_caducar':
+        qs = qs.filter(caducidad__gte=hoy, caducidad__lte=limite)
+        titulo = 'Productos que caducan en 30 días'
+    elif alerta == 'stock_bajo':
+        qs = qs.filter(stock_actual__lte=F('stock_minimo'))
+        titulo = 'Productos con stock bajo'
     if q:
         qs = qs.filter(Q(nombre__icontains=q) | Q(codigo__icontains=q) | Q(ubicacion__icontains=q))
     productos = qs.all()
     return render(request, 'farmacia/producto_list.html',
-                  {'productos': productos, 'q': q})
+                  {'productos': productos, 'q': q, 'alerta': alerta, 'titulo': titulo})
 
 
 @login_required

@@ -23,11 +23,15 @@ def dashboard(request):
         'bloqueados': Usuario.objects.filter(bloqueado_hasta__gt=timezone.now()).count(),
         'stock_bajo': productos_bajo,
     }
-    ventas = Venta.objects.filter(fecha__gte=timezone.now().date() - timedelta(days=29))
-    ventas_dia = ventas.extra(select={'d': "date(fecha)"}).values('d').annotate(total=Sum('total')).order_by('d')
-    dias = [(timezone.now().date() - timedelta(days=29 - i)) for i in range(30)]
+    from django.utils.timezone import localtime, localdate
+    hoy_local = localdate()
+    ventas = Venta.objects.filter(fecha__date__gte=hoy_local - timedelta(days=29))
+    dias = [(hoy_local - timedelta(days=29 - i)) for i in range(30)]
     labels_dia = [d.strftime('%d/%m') for d in dias]
-    totales_dia = [float(next((v['total'] for v in ventas_dia if v['d'] == d), 0) or 0) for d in dias]
+    mapa = {}
+    for v in ventas:
+        mapa[localdate(v.fecha)] = mapa.get(localdate(v.fecha), 0) + float(v.total)
+    totales_dia = [round(mapa.get(d, 0), 2) for d in dias]
     total_mes = float(ventas.aggregate(s=Sum('total'))['s'] or 0)
     num_ventas = ventas.count()
     margen = 0.0

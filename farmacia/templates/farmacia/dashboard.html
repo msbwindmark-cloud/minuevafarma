@@ -73,21 +73,64 @@
         </table>
     </div>
 </div>
-<div class="card shadow mb-4">
-    <div class="card-header bg-warning text-dark"><i class="bi bi-exclamation-triangle"></i> Alertas de caducidad y stock</div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-4">
-                <h6 class="text-danger">Caducados</h6>
-                {% if caducados %}<ul class="list-group list-group-flush">{% for p in caducados %}<li class="list-group-item">{{ p.nombre }} <span class="badge bg-danger">{{ p.caducidad|date:"d/m/Y" }}</span></li>{% endfor %}</ul>{% else %}<p class="text-muted">Ninguno</p>{% endif %}
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow h-100">
+            <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center"><span><i class="bi bi-x-circle"></i> Caducados ({{ caducados|length }})</span><a href="{% url 'producto_list' %}?alerta=caducado" class="btn btn-sm btn-light"><i class="bi bi-list-ul"></i> Ver todos</a></div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-hover datatable mb-0 align-middle" style="width:100%">
+                    <thead class="table-light"><tr><th></th><th>Producto</th><th>Caducidad</th><th class="text-end">Acción</th></tr></thead>
+                    <tbody>
+                    {% for p in caducados %}
+                        <tr class="table-danger">
+                            <td>{% if p.get_foto %}<img src="{{ p.get_foto }}" style="width:30px;height:30px;object-fit:contain;border-radius:5px;background:#f3f6fb;">{% else %}<i class="bi bi-image text-muted"></i>{% endif %}</td>
+                            <td>{{ p.nombre }}</td>
+                            <td>{{ p.caducidad|date:"d/m/Y" }}</td>
+                            <td class="text-end"><a href="{% url 'producto_movimiento' p.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-box-arrow-in-down"></i></a></td>
+                        </tr>
+                    {% empty %}<tr><td colspan="4" class="text-center text-muted">Ninguno</td></tr>{% endfor %}
+                    </tbody>
+                </table>
             </div>
-            <div class="col-md-4">
-                <h6 class="text-warning">Caducan pronto</h6>
-                {% if por_caducar %}<ul class="list-group list-group-flush">{% for p in por_caducar %}<li class="list-group-item">{{ p.nombre }} <span class="badge bg-warning text-dark">{{ p.caducidad|date:"d/m/Y" }}</span></li>{% endfor %}</ul>{% else %}<p class="text-muted">Ninguno</p>{% endif %}
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow h-100">
+            <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center"><span><i class="bi bi-hourglass-split"></i> Caducan pronto ({{ por_caducar|length }})</span><a href="{% url 'producto_list' %}?alerta=por_caducar" class="btn btn-sm btn-light"><i class="bi bi-list-ul"></i> Ver todos</a></div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-hover datatable mb-0 align-middle" style="width:100%">
+                    <thead class="table-light"><tr><th></th><th>Producto</th><th>Caducidad</th><th class="text-end">Acción</th></tr></thead>
+                    <tbody>
+                    {% for p in por_caducar %}
+                        <tr class="table-warning">
+                            <td>{% if p.get_foto %}<img src="{{ p.get_foto }}" style="width:30px;height:30px;object-fit:contain;border-radius:5px;background:#f3f6fb;">{% else %}<i class="bi bi-image text-muted"></i>{% endif %}</td>
+                            <td>{{ p.nombre }}</td>
+                            <td>{{ p.caducidad|date:"d/m/Y" }}</td>
+                            <td class="text-end"><a href="{% url 'producto_movimiento' p.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-box-arrow-in-down"></i></a></td>
+                        </tr>
+                    {% empty %}<tr><td colspan="4" class="text-center text-muted">Ninguno</td></tr>{% endfor %}
+                    </tbody>
+                </table>
             </div>
-            <div class="col-md-4">
-                <h6 class="text-info">Stock bajo</h6>
-                {% if stock_bajo_list %}<ul class="list-group list-group-flush">{% for p in stock_bajo_list %}<li class="list-group-item">{{ p.nombre }} <span class="badge bg-info">{{ p.stock_actual }}/{{ p.stock_minimo }}</span></li>{% endfor %}</ul>{% else %}<p class="text-muted">Ninguno</p>{% endif %}
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow h-100">
+            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center"><span><i class="bi bi-arrow-down-square"></i> Stock bajo ({{ stock_bajo_list|length }})</span><a href="{% url 'producto_list' %}?alerta=stock_bajo" class="btn btn-sm btn-light"><i class="bi bi-list-ul"></i> Ver todos</a></div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-hover datatable mb-0 align-middle" style="width:100%">
+                    <thead class="table-light"><tr><th></th><th>Producto</th><th>Stock</th><th class="text-end">Acción</th></tr></thead>
+                    <tbody>
+                    {% for p in stock_bajo_list %}
+                        <tr class="table-info">
+                            <td>{% if p.get_foto %}<img src="{{ p.get_foto }}" style="width:30px;height:30px;object-fit:contain;border-radius:5px;background:#f3f6fb;">{% else %}<i class="bi bi-image text-muted"></i>{% endif %}</td>
+                            <td>{{ p.nombre }}</td>
+                            <td>{{ p.stock_actual }} / mín {{ p.stock_minimo }}</td>
+                            <td class="text-end"><a href="{% url 'producto_movimiento' p.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-box-arrow-in-down"></i></a></td>
+                        </tr>
+                    {% empty %}<tr><td colspan="4" class="text-center text-muted">Ninguno</td></tr>{% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
