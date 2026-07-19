@@ -7,16 +7,20 @@
 <div class="col-md-7">
 <div class="card shadow"><div class="card-header">Productos</div><div class="card-body">
 <form method="post" id="addForm">{% csrf_token %}
-<div class="input-group mb-2"><select name="producto" class="form-control">{% for p in productos %}<option value="{{ p.pk }}">{{ p.nombre }} ({{ p.precio_venta }} EUR) - stock {{ p.stock_actual }}</option>{% endfor %}</select>
-<input type="number" name="cantidad" value="1" min="1" class="form-control" style="max-width:90px;"><button class="btn btn-primary">Añadir</button></div>
+<input type="text" id="buscarProd" class="form-control mb-2" placeholder="Buscar producto por nombre o código..." autocomplete="off">
+<div id="listaProd" class="d-flex flex-column gap-1 mb-2" style="max-height:260px;overflow:auto;"></div>
+<select name="producto" id="selProducto" class="form-control mb-2 d-none">{% for p in productos %}<option value="{{ p.pk }}">{{ p.nombre }} ({{ p.precio_venta }} EUR) - stock {{ p.stock_actual }}</option>{% endfor %}</select>
+<div class="input-group"><input type="number" name="cantidad" value="1" min="1" class="form-control" style="max-width:90px;" id="cantProd"><button class="btn btn-primary" type="submit">Añadir al carrito</button></div>
 </form>
 </div></div>
 <div class="col-md-5">
 <div class="card shadow"><div class="card-header">Carrito</div><div class="card-body">
 {% if carrito %}<ul class="list-group mb-2">{% for i in carrito %}<li class="list-group-item d-flex justify-content-between">{{ i.nombre }} x{{ i.cantidad }} <span>{{ i.subtotal }} EUR <a href="{% url 'venta_quitar' i.id %}"><i class="bi bi-x-circle text-danger"></i></a></span></li>{% endfor %}</ul>
+<button type="button" class="btn btn-warning btn-sm w-100 mb-2" id="btnInteracciones"><i class="bi bi-exclamation-triangle"></i> Chequear interacciones</button>
 <h5>Total: {{ total }} EUR</h5>
 {% else %}<p class="text-muted">Carrito vacío.</p>{% endif %}
 </div></div>
+<div class="card shadow mt-3" id="cardSugerencias" style="display:none;"><div class="card-header bg-info text-white"><i class="bi bi-lightbulb"></i> Clientes que compraron esto también compraron</div><div class="card-body" id="cuerpoSugerencias"></div></div>
 </div>
 </div>
 <div class="card shadow mt-3"><div class="card-body">
@@ -32,6 +36,7 @@
 <button type="submit" class="btn btn-success"><i class="bi bi-check-lg"></i> Cobrar y generar ticket</button>
 </form>
 </div></div>
+<div class="card shadow mt-3" id="cardHistoria" style="display:none;"><div class="card-header bg-secondary text-white"><i class="bi bi-person-vcard"></i> Historia del cliente</div><div class="card-body" id="cuerpoHistoria"></div></div>
 {% endblock %}
 {% block extra_js %}
 <script>
@@ -59,6 +64,84 @@ document.addEventListener("DOMContentLoaded", function(){
 $("#addForm").on("submit", function(e){
   e.preventDefault();
   $.post("{% url 'venta_agregar' %}", $(this).serialize() + "&csrfmiddlewaretoken={{ csrf_token }}", function(){ location.reload(); });
+});
+function cargarSugerencias(){
+  fetch("/api/sugerencias/", {headers:{"x-requested-with":"XMLHttpRequest"}}).then(r=>r.json()).then(d=>{
+    if(d.sugerencias && d.sugerencias.length){
+      var h = "<div class='d-flex flex-wrap gap-2'>";
+      d.sugerencias.forEach(function(s){
+        var img = s.foto ? "<img src='"+s.foto+"' style='width:28px;height:28px;object-fit:contain;border-radius:5px;background:#f3f6fb;'>" : "";
+        h += "<span class='badge bg-light text-dark border p-2'>"+img+" "+s.nombre+" <small class='text-muted'>"+s.precio+" EUR</small></span>";
+      });
+      h += "</div>";
+      document.getElementById("cuerpoSugerencias").innerHTML = h;
+      document.getElementById("cardSugerencias").style.display = "block";
+    } else {
+      document.getElementById("cardSugerencias").style.display = "none";
+    }
+  }).catch(function(){ document.getElementById("cardSugerencias").style.display = "none"; });
+}
+cargarSugerencias();
+let buscadorTimer = null;
+function renderListaProd(lista){
+  const box = document.getElementById("listaProd");
+  box.innerHTML = "";
+  if(!lista.length){ box.innerHTML = "<p class='text-muted small'>Sin resultados</p>"; return; }
+  lista.forEach(function(p){
+    const img = p.foto ? "<img src='"+p.foto+"' style='width:30px;height:30px;object-fit:contain;border-radius:5px;background:#f3f6fb;'>" : "<i class='bi bi-image text-muted'></i>";
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "btn btn-outline-secondary text-start d-flex justify-content-between align-items-center";
+    b.innerHTML = "<span class='d-flex align-items-center'>"+img+" <span class='ms-2'>"+p.nombre+"</span></span><span class='small'>"+p.precio_venta+" EUR · stock "+p.stock_actual+"</span>";
+    b.onclick = function(){ document.getElementById("selProducto").value = p.id; };
+    box.appendChild(b);
+  });
+}
+function buscarProductos(){
+  const q = document.getElementById("buscarProd").value.trim();
+  fetch("/api/productos/?q="+encodeURIComponent(q), {headers:{"x-requested-with":"XMLHttpRequest"}})
+    .then(r=>r.json()).then(d=>{ renderListaProd(d.productos || []); }).catch(function(){ document.getElementById("listaProd").innerHTML = ""; });
+}
+document.getElementById("buscarProd").addEventListener("keyup", function(){ clearTimeout(buscadorTimer); buscadorTimer = setTimeout(buscarProductos, 250); });
+buscarProductos();
+function buscarHistoria(){
+  const q = ($("#id_cliente_email").val() || $("#id_cliente_telefono").val() || "").trim();
+  if(q.length < 3){ document.getElementById("cardHistoria").style.display = "none"; return; }
+  fetch("/api/historia/?q="+encodeURIComponent(q), {headers:{"x-requested-with":"XMLHttpRequest"}}).then(r=>r.json()).then(d=>{
+    const card = document.getElementById("cardHistoria");
+    const body = document.getElementById("cuerpoHistoria");
+    if(!d.encontrado){
+      card.style.display = "none"; return;
+    }
+    let h = "<p><strong>Cliente:</strong> "+d.cliente.nombre+" <span class='badge bg-success'>"+(d.cliente.puntos||0)+" pts</span></p>";
+    if(d.cliente.alergias){
+      h += "<div class='alert alert-danger'><i class='bi bi-exclamation-octagon'></i> <strong>Alergias / observaciones:</strong> "+d.cliente.alergias+"</div>";
+    }
+    if(d.compras && d.compras.length){
+      h += "<h6>Últimas compras</h6><ul class='list-group'>";
+      d.compras.forEach(c=>{ h += "<li class='list-group-item'>"+c.fecha+" - "+c.total+" EUR<div class='text-muted small'>"+c.productos.join(", ")+"</div></li>"; });
+      h += "</ul>";
+    } else { h += "<p class='text-muted'>Sin compras previas.</p>"; }
+    body.innerHTML = h;
+    card.style.display = "block";
+  });
+}
+$("#id_cliente_email, #id_cliente_telefono").on("blur", buscarHistoria);
+$("#btnInteracciones").on("click", function(){
+  var b = $(this); b.prop("disabled", true).html('<i class="bi bi-hourglass-split"></i> Consultando CIMA...');
+  fetch("/api/interacciones/carrito/", {headers:{"x-requested-with":"XMLHttpRequest"}})
+    .then(r=>r.json()).then(d=>{
+      b.prop("disabled", false).html('<i class="bi bi-exclamation-triangle"></i> Chequear interacciones');
+      if(!d.interacciones || !d.interacciones.length){
+        Swal.fire("Sin interacciones conocidas", "No se detectaron interacciones entre los medicamentos del carrito.", "success");
+      } else {
+        var html = "<div class='list-group'>";
+        d.interacciones.forEach(function(x){
+          html += "<div class='list-group-item list-group-item-danger'><strong>"+x.nombre_a+" + "+x.nombre_b+"</strong><br>"+(x.descripcion||"Interaccion detectada")+"</div>";
+        });
+        html += "</div>";
+        Swal.fire({title:"⚠ Interacciones detectadas ("+d.interacciones.length+")", html:html, width:600, icon:"warning"});
+      }
+    }).catch(function(){ b.prop("disabled", false).html('<i class="bi bi-exclamation-triangle"></i> Chequear interacciones'); Swal.fire("Error","No se pudo consultar CIMA","error"); });
 });
 </script>
 {% endblock %}

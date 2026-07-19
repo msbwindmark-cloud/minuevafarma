@@ -6,6 +6,9 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from decimal import Decimal
 from farmacia.models import Producto, Venta, DetalleVenta, Empleado, Auditoria, MovimientoStock
+from farmacia.interacciones import chequear
+from farmacia.sugerencias import sugerir
+from farmacia.models import Cliente, Venta, DetalleVenta
 
 
 def _enviar_notificaciones(venta, request):
@@ -91,4 +94,55 @@ def venta_offline(request):
     if not codigo:
         return JsonResponse({"ok": False, "msg": "Carrito vacio"}, status=400)
     return JsonResponse({"ok": True, "codigo": codigo})
+
+
+@login_required
+def chequear_interacciones_carrito(request):
+    items = request.session.get("carrito", [])
+    ids = [i["id"] for i in items]
+    cns = list(Producto.objects.filter(id__in=ids).exclude(cn="").values_list("cn", flat=True))
+    res = chequear(cns)
+    nombres = {p.cn: p.nombre for p in Producto.objects.filter(cn__in=cns)}
+    for r in res:
+        r["nombre_a"] = nombres.get(r["a"], r["a"])
+        r["nombre_b"] = nombres.get(r["b"], r["b"])
+    return JsonResponse({"ok": True, "interacciones": res})
+
+
+@login_required
+def chequear_interacciones(request):
+    if not cns:
+        ids = request.GET.getlist("id")
+        cns = list(Producto.objects.filter(id__in=ids).exclude(cn="").values_list("cn", flat=True))
+    res = chequear(cns)
+    nombres = {p.cn: p.nombre for p in Producto.objects.filter(cn__in=cns)}
+    for r in res:
+        r["nombre_a"] = nombres.get(r["a"], r["a"])
+        r["nombre_b"] = nombres.get(r["b"], r["b"])
+    return JsonResponse({"ok": True, "interacciones": res})
+
+
+@login_required
+def sugerencias_api(request):
+    ids = request.GET.getlist("id")
+    if not ids:
+        ids = [i["id"] for i in request.session.get("carrito", [])]
+    sug = sugerir([str(x) for x in ids])
+    return JsonResponse({"ok": True, "sugerencias": sug})
+
+
+@login_required
+def historia_cliente(request):
+    q = request.GET.get("q", "").strip()
+    if not q:
+        return JsonResponse({"ok": True, "encontrado": False})
+    cliente = Cliente.objects.filter(email__iexact=q).first() or Cliente.objects.filter(telefono=q).first()
+    if not cliente:
+        return JsonResponse({"ok": True, "encontrado": False})
+    ventas = Venta.objects.filter(cliente_email__iexact=cliente.email).order_by("-fecha")[:10]
+    compras = []
+    for v in ventas:
+        prods = [d.nombre for d in v.detalles.all()[:6]]
+        compras.append({"fecha": v.fecha.strftime("%d/%m/%Y %H:%M"), "total": float(v.total), "productos": prods})
+    return JsonResponse({"ok": True, "encontrado": True, "cliente": {"nombre": cliente.nombre, "alergias": cliente.alergias, "puntos": cliente.puntos}, "compras": compras})
 

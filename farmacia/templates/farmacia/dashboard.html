@@ -4,25 +4,55 @@
 <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item active">Inicio</li></ol></nav>
 <h2 class="mb-4"><i class="bi bi-speedometer2"></i> Panel de control</h2>
 <div class="row g-3 mb-4">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card text-bg-primary shadow">
             <div class="card-body"><h5>Usuarios</h5><h2>{{ stats.usuarios }}</h2></div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card text-bg-success shadow">
             <div class="card-body"><h5>Logins hoy</h5><h2>{{ stats.logins_hoy }}</h2></div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card text-bg-danger shadow">
-            <div class="card-body"><h5>Cuentas bloqueadas</h5><h2>{{ stats.bloqueados }}</h2></div>
+    <div class="col-md-3">
+        <div class="card text-bg-warning shadow">
+            <div class="card-body"><h5>Stock bajo</h5><h2>{{ stats.stock_bajo }}</h2></div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card text-bg-warning shadow">
-            <div class="card-body"><h5>Productos stock bajo</h5><h2>{{ stats.stock_bajo }}</h2></div>
+    <div class="col-md-3">
+        <div class="card text-bg-danger shadow">
+            <div class="card-body"><h5>Bloqueadas</h5><h2>{{ stats.bloqueados }}</h2></div>
         </div>
+    </div>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card text-bg-info shadow"><div class="card-body"><h6>Ventas (30 días)</h6><h3>{{ graficos.num_ventas }}</h3></div></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-dark shadow"><div class="card-body"><h6>Facturación (30 días)</h6><h3>{{ graficos.total_mes }} €</h3></div></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-secondary shadow"><div class="card-body"><h6>Margen estimado</h6><h3>{{ graficos.margen }} €</h3></div></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-light shadow border"><div class="card-body"><h6>Ticket medio</h6><h3>{% if graficos.num_ventas %}{{ graficos.total_mes|floatformat:2|default:0 }}{% else %}0{% endif %} €</h3></div></div>
+    </div>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-8">
+        <div class="card shadow"><div class="card-header"><i class="bi bi-graph-up"></i> Facturación diaria (últimos 30 días)</div>
+            <div class="card-body"><canvas id="grafVentasDia" height="120"></canvas></div></div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow"><div class="card-header"><i class="bi bi-pie-chart"></i> Por método de pago</div>
+            <div class="card-body"><canvas id="grafMetodo" height="220"></canvas></div></div>
+    </div>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-8">
+        <div class="card shadow"><div class="card-header"><i class="bi bi-trophy"></i> Top productos por ingreso</div>
+            <div class="card-body"><canvas id="grafTop" height="140"></canvas></div></div>
     </div>
 </div>
 <div class="card shadow">
@@ -43,4 +73,42 @@
         </table>
     </div>
 </div>
+<div class="card shadow mb-4">
+    <div class="card-header bg-warning text-dark"><i class="bi bi-exclamation-triangle"></i> Alertas de caducidad y stock</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <h6 class="text-danger">Caducados</h6>
+                {% if caducados %}<ul class="list-group list-group-flush">{% for p in caducados %}<li class="list-group-item">{{ p.nombre }} <span class="badge bg-danger">{{ p.caducidad|date:"d/m/Y" }}</span></li>{% endfor %}</ul>{% else %}<p class="text-muted">Ninguno</p>{% endif %}
+            </div>
+            <div class="col-md-4">
+                <h6 class="text-warning">Caducan pronto</h6>
+                {% if por_caducar %}<ul class="list-group list-group-flush">{% for p in por_caducar %}<li class="list-group-item">{{ p.nombre }} <span class="badge bg-warning text-dark">{{ p.caducidad|date:"d/m/Y" }}</span></li>{% endfor %}</ul>{% else %}<p class="text-muted">Ninguno</p>{% endif %}
+            </div>
+            <div class="col-md-4">
+                <h6 class="text-info">Stock bajo</h6>
+                {% if stock_bajo_list %}<ul class="list-group list-group-flush">{% for p in stock_bajo_list %}<li class="list-group-item">{{ p.nombre }} <span class="badge bg-info">{{ p.stock_actual }}/{{ p.stock_minimo }}</span></li>{% endfor %}</ul>{% else %}<p class="text-muted">Ninguno</p>{% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+const G = {{ graficos|safe }};
+new Chart(document.getElementById('grafVentasDia'), {
+  type: 'line',
+  data: { labels: G.labels_dia, datasets: [{ label:'€/día', data: G.totales_dia, borderColor:'#0d6efd', backgroundColor:'rgba(13,110,253,0.15)', fill:true, tension:0.3 }] },
+  options: { plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:true } } }
+});
+new Chart(document.getElementById('grafMetodo'), {
+  type: 'doughnut',
+  data: { labels: G.labels_metodo, datasets: [{ data: G.totales_metodo, backgroundColor:['#0d6efd','#198754','#ffc107','#dc3545','#6f42c1'] }] },
+  options: { plugins:{ legend:{ position:'bottom' } } }
+});
+new Chart(document.getElementById('grafTop'), {
+  type: 'bar',
+  data: { labels: G.labels_top, datasets: [{ label:'Ingreso €', data: G.ingreso_top, backgroundColor:'#198754' }] },
+  options: { indexAxis:'y', plugins:{ legend:{display:false} }, scales:{ x:{ beginAtZero:true } } }
+});
+</script>
 {% endblock %}

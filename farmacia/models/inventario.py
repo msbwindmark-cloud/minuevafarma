@@ -59,6 +59,7 @@ class Producto(models.Model):
     ubicacion = models.CharField(max_length=30, blank=True, verbose_name="Ubicación estantería (p.ej. A3)")
     caducidad = models.DateField(blank=True, null=True)
     foto = models.ImageField(upload_to='productos/', blank=True, null=True)
+    foto_url = models.URLField(blank=True, verbose_name="URL foto (CIMA)")
     activo = models.BooleanField(default=True)
     creado = models.DateTimeField(auto_now_add=True)
     actualizado = models.DateTimeField(auto_now=True)
@@ -76,6 +77,13 @@ class Producto(models.Model):
 
     def caducado(self):
         return self.caducidad and self.caducidad < timezone.now().date()
+
+    def get_foto(self):
+        if self.foto:
+            return self.foto.url
+        if self.foto_url:
+            return self.foto_url
+        return ""
 
 
 class MovimientoStock(models.Model):

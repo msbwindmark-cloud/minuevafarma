@@ -3,9 +3,10 @@ import secrets
 from datetime import timedelta
 
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth import authenticate
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 
 from farmacia.models import Usuario, Producto, Categoria, Proveedor
@@ -37,6 +38,8 @@ def offline_app(request):
                 "stock_actual": p.stock_actual,
                 "categoria": p.categoria.nombre if p.categoria else "",
                 "ubicacion": p.ubicacion,
+                "foto": p.get_foto(),
+                "cn": p.cn,
             })
         ctx["usuario_json"] = json.dumps(usuario)
         ctx["token_json"] = token
@@ -79,9 +82,13 @@ def api_login(request):
 def api_productos(request):
     if request.method != "GET":
         return JsonResponse({"ok": False, "msg": "Metodo no permitido"}, status=405)
+    q = request.GET.get("q", "").strip()
     productos = Producto.objects.select_related("categoria", "proveedor").all()
+    if q:
+        from django.db.models import Q
+        productos = productos.filter(Q(nombre__icontains=q) | Q(codigo__icontains=q) | Q(categoria__nombre__icontains=q))
     data = []
-    for p in productos:
+    for p in productos[:200]:
         data.append({
             "id": str(p.id),
             "codigo": p.codigo,
@@ -90,5 +97,23 @@ def api_productos(request):
             "stock_actual": p.stock_actual,
             "categoria": p.categoria.nombre if p.categoria else "",
             "ubicacion": p.ubicacion,
+            "foto": p.get_foto(),
         })
     return JsonResponse({"ok": True, "productos": data})
+
+
+@login_required
+def api_producto_detalle(request, pk):
+    p = get_object_or_404(Producto, pk=pk)
+    return JsonResponse({
+        "ok": True,
+        "producto": {
+            "nombre": p.nombre,
+            "codigo": p.codigo,
+            "descripcion": p.descripcion or "",
+            "categoria": p.categoria.nombre if p.categoria else "",
+            "precio": float(p.precio_venta),
+            "stock": p.stock_actual,
+            "foto": p.get_foto(),
+        }
+    })

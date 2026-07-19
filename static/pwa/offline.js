@@ -97,6 +97,7 @@ function entrarApp(){
         </div>
         <div class="col-md-5">
           <div class="card shadow"><div class="card-header">Carrito</div><div class="card-body" id="carrito"></div></div>
+          <div id="sugerencias" class="mt-2"></div>
         </div>
       </div>
     </div>`;
@@ -138,7 +139,8 @@ function renderProductos(){
   const lista = $("#lista");
   lista.innerHTML = "";
   PRODUCTOS.filter(p=>p.nombre.toLowerCase().includes(q) || p.codigo.toLowerCase().includes(q)).forEach(p=>{
-    const b = el("button", {class:"btn btn-outline-secondary text-start d-flex justify-content-between"}, "<span>"+p.nombre+"</span><span>"+p.precio_venta+" EUR · stock "+p.stock_actual+"</span>");
+    const img = p.foto ? "<img src='"+p.foto+"' style='width:34px;height:34px;object-fit:contain;border-radius:6px;background:#f3f6fb;margin-right:8px;'>" : "<i class='bi bi-image text-muted' style='margin-right:8px;'></i>";
+    const b = el("button", {class:"btn btn-outline-secondary text-start d-flex justify-content-between align-items-center"}, "<span class='d-flex align-items-center'>"+img+p.nombre+"</span><span>"+p.precio_venta+" EUR · stock "+p.stock_actual+"</span>");
     b.onclick = ()=>carritoAdd(p);
     lista.appendChild(b);
   });
@@ -149,7 +151,7 @@ function carritoCargar(){ CARRITO = JSON.parse(sessionStorage.getItem("mf_carrit
 function carritoGuardar(){ sessionStorage.setItem("mf_carrito", JSON.stringify(CARRITO)); }
 function carritoAdd(p){
   const f = CARRITO.find(c=>c.id===p.id);
-  if(f){ f.cantidad++; } else { CARRITO.push({id:p.id, codigo:p.codigo, nombre:p.nombre, precio:p.precio_venta, cantidad:1}); }
+  if(f){ f.cantidad++; } else { CARRITO.push({id:p.id, codigo:p.codigo, nombre:p.nombre, precio:p.precio_venta, cantidad:1, foto:p.foto, cn:p.cn}); }
   carritoGuardar(); renderCarrito();
 }
 function carritoMenos(id){ const f=CARRITO.find(c=>c.id===id); if(f){ f.cantidad--; if(f.cantidad<=0) CARRITO=CARRITO.filter(c=>c.id!==id); } carritoGuardar(); renderCarrito(); }
@@ -161,12 +163,52 @@ function renderCarrito(){
   const c = $("#carrito"); if(!c) return;
   if(!CARRITO.length){ c.innerHTML = "<p class='text-muted'>Carrito vacio.</p>"; return; }
   let html = "<ul class='list-group mb-2'>";
-  CARRITO.forEach(i=>{ html += "<li class='list-group-item d-flex justify-content-between align-items-center'>"+i.nombre+" x"+i.cantidad+"<span>"+(i.precio*i.cantidad).toFixed(2)+" EUR <button class='btn btn-sm btn-outline-danger' onclick=\"carritoQuitar('"+i.id+"')\"><i class='bi bi-x'></i></button></span></li>"; });
+  CARRITO.forEach(i=>{ const img = i.foto ? "<img src='"+i.foto+"' style='width:28px;height:28px;object-fit:contain;border-radius:5px;background:#f3f6fb;margin-right:6px;'>" : ""; html += "<li class='list-group-item d-flex justify-content-between align-items-center'>"+img+i.nombre+" x"+i.cantidad+"<span>"+(i.precio*i.cantidad).toFixed(2)+" EUR <button class='btn btn-sm btn-outline-danger' onclick=\"carritoQuitar('"+i.id+"')\"><i class='bi bi-x'></i></button></span></li>"; });
   html += "</ul><h5>Total: "+carritoTotal().toFixed(2)+" EUR</h5>";
+  html += "<button class='btn btn-warning w-100 mb-2' onclick='chequearInteracciones()'><i class='bi bi-exclamation-triangle'></i> Chequear interacciones</button>";
   html += "<button class='btn btn-success w-100' onclick='cobrar()'><i class='bi bi-check-lg'></i> Cobrar y generar ticket</button>";
   c.innerHTML = html;
+  cargarSugerencias();
 }
 
+function chequearInteracciones(){
+  const cns = CARRITO.map(c=>c.cn).filter(Boolean);
+  if(!cns.length){ Swal.fire("Sin fármacos", "No hay medicamentos con código CIMA en el carrito para comprobar.", "info"); return; }
+  Swal.fire({title:"Consultando CIMA...", allowOutsideClick:false, didOpen:function(){ Swal.showLoading(); }});
+  fetch("/api/interacciones/?cn="+cns.join("&cn="), {headers:{"x-requested-with":"XMLHttpRequest"}})
+    .then(r=>r.json()).then(d=>{
+      if(!d.interacciones || !d.interacciones.length){
+        Swal.fire("Sin interacciones conocidas", "No se detectaron interacciones entre los medicamentos del carrito.", "success");
+      } else {
+        let html = "<div class='list-group'>";
+        d.interacciones.forEach(x=>{ html += "<div class='list-group-item list-group-item-danger'><strong>"+x.nombre_a+" + "+x.nombre_b+"</strong><br>"+(x.descripcion||"Interacción detectada")+"</div>"; });
+        html += "</div>";
+        Swal.fire({title:"⚠ Interacciones detectadas ("+d.interacciones.length+")", html:html, width:600, icon:"warning"});
+      }
+    }).catch(()=>{ Swal.fire("Error","No se pudo consultar CIMA","error"); });
+}
+
+function cargarSugerencias(){
+  const ids = CARRITO.map(c=>c.id);
+  if(!ids.length){ $("#sugerencias").html(""); return; }
+  fetch("/api/sugerencias/?id="+ids.join("&id="), {headers:{"x-requested-with":"XMLHttpRequest"}})
+    .then(r=>r.json()).then(d=>{
+      const box = $("#sugerencias");
+      if(d.sugerencias && d.sugerencias.length){
+        let h = "<h6 class='mt-2'><i class='bi bi-lightbulb'></i> También compraron</h6><div class='d-flex flex-wrap gap-2'>";
+        d.sugerencias.forEach(s=>{
+          const img = s.foto ? "<img src='"+s.foto+"' style='width:24px;height:24px;object-fit:contain;border-radius:4px;background:#f3f6fb;'>" : "";
+          h += "<button class='btn btn-sm btn-outline-info' onclick='addPorId(\""+s.id+"\")'>"+img+" "+s.nombre+" "+s.precio+" EUR</button>";
+        });
+        h += "</div>";
+        box.innerHTML = h;
+      } else { box.innerHTML = ""; }
+    }).catch(()=>{ $("#sugerencias").html(""); });
+}
+function addPorId(id){
+  const p = PRODUCTOS.find(x=>x.id===id);
+  if(p) carritoAdd(p);
+}
 function cobrar(){
   if(!CARRITO.length){ Swal.fire("Carrito vacio", "Anade productos primero", "warning"); return; }
   const total = carritoTotal();

@@ -20,11 +20,12 @@
     <div class="card-body p-0">
         <table class="table table-hover mb-0 datatable" id="tablaProductos">
             <thead class="table-light">
-                <tr><th>Código</th><th>Nombre</th><th>Categorí­a</th><th>Ubicación</th><th class="text-end">Stock</th><th class="text-end">P. venta</th><th></th></tr>
+                <tr><th></th><th>Código</th><th>Nombre</th><th>Categorí­a</th><th>Ubicación</th><th class="text-end">Stock</th><th class="text-end">P. venta</th><th></th></tr>
             </thead>
             <tbody>
             {% for p in productos %}
                 <tr class="{% if p.stock_bajo %}table-warning{% endif %}">
+                    <td class="text-center">{% if p.get_foto %}<img src="{{ p.get_foto }}" alt="{{ p.nombre }}" style="width:42px;height:42px;object-fit:contain;border-radius:8px;background:#f3f6fb;">{% else %}<i class="bi bi-image text-muted"></i>{% endif %}</td>
                     <td>{{ p.codigo }}</td>
                     <td>{{ p.nombre }}{% if p.stock_bajo %} <span class="badge bg-warning text-dark">Stock bajo</span>{% endif %}{% if p.caducado %} <span class="badge bg-danger">Caducado</span>{% endif %}</td>
                     <td>{{ p.categoria|default:"-" }}</td>
@@ -32,14 +33,14 @@
                     <td class="text-end">{{ p.stock_actual }}</td>
                     <td class="text-end">{{ p.precio_venta }} â‚¬</td>
                     <td class="text-end">
-                        <button class="btn btn-sm btn-outline-success" title="Ficha técnica CIMA" onclick="verFicha('{{ p.pk }}')"><i class="bi bi-capsule-pill"></i></button>
+                        <button class="btn btn-sm btn-outline-success" title="Ver producto y ficha CIMA" onclick="verProducto('{{ p.pk }}')"><i class="bi bi-capsule-pill"></i></button>
                         <a href="{% url 'producto_movimiento' p.pk %}" class="btn btn-sm btn-outline-info" title="Movimiento"><i class="bi bi-arrow-left-right"></i></a>
                         <a href="{% url 'producto_update' p.pk %}" class="btn btn-sm btn-outline-primary" title="Editar"><i class="bi bi-pencil"></i></a>
                         <a href="{% url 'producto_delete' p.pk %}" class="btn btn-sm btn-outline-danger" title="Eliminar"><i class="bi bi-trash"></i></a>
                     </td>
                 </tr>
             {% empty %}
-                <tr><td colspan="7" class="text-center">Sin productos</td></tr>
+                <tr><td colspan="8" class="text-center">Sin productos</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -62,6 +63,24 @@ function verFicha(pk){
   fetch('/productos/' + pk + '/ficha/', {headers:{'x-requested-with':'XMLHttpRequest'}})
     .then(r=>r.text()).then(h=>{ document.getElementById('cuerpoFicha').innerHTML = h; })
     .catch(()=>{ document.getElementById('cuerpoFicha').innerHTML = '<div class="alert alert-danger">Error al consultar CIMA</div>'; });
+}
+function verProducto(pk){
+  fetch('/api/producto/' + pk + '/', {headers:{'x-requested-with':'XMLHttpRequest'}})
+    .then(r=>r.json()).then(d=>{
+      if(!d.ok){ Swal.fire('Error','No se pudo cargar el producto','error'); return; }
+      var p = d.producto;
+      var img = p.foto ? "<img src='"+p.foto+"' style='width:120px;height:120px;object-fit:contain;border-radius:10px;background:#f3f6fb;' class='mb-2'>" : "<i class='bi bi-image text-muted' style='font-size:4rem;'></i>";
+      var desc = p.descripcion ? p.descripcion : "<em>Sin descripción.</em>";
+      Swal.fire({
+        title: p.nombre,
+        html: "<div class='text-center'>"+img+"</div>" +
+              "<p class='text-muted small mb-1'>"+p.categoria+" · Código "+p.codigo+"</p>" +
+              "<p><strong>Precio:</strong> "+p.precio+" EUR &nbsp; <strong>Stock:</strong> "+p.stock+"</p>" +
+              "<p class='text-start'>"+desc+"</p>",
+        showCancelButton: true, confirmButtonText: '<i class="bi bi-capsule-pill"></i> Ficha técnica CIMA', cancelButtonText: 'Cerrar', width: 480
+      }).then(function(res){ if(res.isConfirmed){ verFicha(pk); } });
+    })
+    .catch(()=>{ Swal.fire('Error','No se pudo cargar el producto','error'); });
 }
 </script>
 {% endblock %}

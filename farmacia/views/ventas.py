@@ -11,6 +11,7 @@ from django.conf import settings
 from farmacia.models import Producto, Venta, DetalleVenta, Empleado, Auditoria, MovimientoStock
 from farmacia.forms import VentaForm
 import qrcode
+import base64
 from io import BytesIO
 from base64 import b64encode
 
@@ -22,12 +23,35 @@ def _ip(request):
 
 def _carrito(request):
     return request.session.get("carrito", [])
-
-
-def _guardar_carrito(request, items):
-    request.session["carrito"] = items
-    request.session.modified = True
-
+def _guardar_carrito(request, items):
+    request.session["carrito"] = items
+
+
+    request.session.modified = True
+
+
+def _guardar_cliente(venta):
+    from farmacia.models import Cliente
+    nombre = (venta.cliente_nombre or "").strip()
+    email = (venta.cliente_email or "").strip()
+    telefono = (venta.cliente_telefono or "").strip()
+    if not nombre or (not email and not telefono):
+        return
+    cl = None
+    if email:
+        cl = Cliente.objects.filter(email__iexact=email).first()
+    if not cl and telefono:
+        cl = Cliente.objects.filter(telefono=telefono).first()
+    if cl:
+        if not cl.nombre and nombre:
+            cl.nombre = nombre
+        cl.puntos += int(round(float(venta.total)))
+        cl.save()
+    else:
+        cl = Cliente.objects.create(nombre=nombre, email=email, telefono=telefono)
+        cl.puntos += int(round(float(venta.total)))
+        cl.save()
+
 
 @login_required
 def venta_nueva(request):
@@ -64,6 +88,8 @@ def venta_nueva(request):
                     producto=p, tipo="SALIDA", cantidad=cant,
                     stock_resultante=p.stock_actual, motivo="Venta " + venta.codigo,
                     usuario=request.user, ip=_ip(request))
+            _guardar_cliente(venta)
+
             Auditoria.objects.create(accion="CREATE", modelo="Venta",
                 objeto_id=str(venta.id), descripcion="Venta " + venta.codigo + " total " + str(total) + " EUR",
                 usuario=request.user, ip=_ip(request))
@@ -115,9 +141,22 @@ def venta_list(request):
 def venta_ticket(request, pk):
     venta = get_object_or_404(Venta, pk=pk)
     detalles = venta.detalles.all()
-    qr = generar_qr(venta)
+    qr = generar_qr(venta)
+
+    detalles_qr = []
+    for d in detalles:
+        qr_p = qrs_producto.get(d.id)
+        detalles_qr.append((d, qr_p))
+        if d.producto and d.producto.cn:
+            try:
+                link = "https://cima.aemps.es/cima/publico/html/nomenclator.html?nregistro=" + d.producto.cn
+                qimg = qrcode.make(link)
+                b = BytesIO(); qimg.save(b, format="PNG"); b.seek(0)
+                qrs_producto[d.id] = "data:image/png;base64," + base64.b64encode(b.getvalue()).decode()
+            except Exception:
+                pass
     return render(request, "farmacia/venta_ticket.html",
-                  {"venta": venta, "detalles": detalles, "qr": qr})
+                  {"venta": venta, "detalles": detalles, "detalles_qr": detalles_qr, "qr": qr})
 
 
 def venta_verificar(request, pk):
@@ -161,7 +200,8 @@ def venta_ticket_pdf(request, pk):
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Image as RLImage
     from reportlab.platypus import TableStyle
     from reportlab.lib.styles import getSampleStyleSheet
-    from io import BytesIO as _B
+    import base64
+    from io import BytesIO as _B
     buf = _B()
     doc = SimpleDocTemplate(buf, pagesize=A4, topMargin=20*mm, bottomMargin=20*mm)
     ss = getSampleStyleSheet()
@@ -195,3 +235,8 @@ def venta_ticket_pdf(request, pk):
     resp = HttpResponse(buf.getvalue(), content_type='application/pdf')
     resp['Content-Disposition'] = 'attachment; filename="ticket_' + venta.codigo + '.pdf"'
     return resp
+
+
+
+
+
