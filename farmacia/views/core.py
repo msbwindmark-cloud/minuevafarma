@@ -8,7 +8,7 @@ from farmacia.models import Auditoria, Usuario, Producto
 @login_required
 def dashboard(request):
     total_usuarios = Usuario.objects.count()
-    ultimos_logs = Auditoria.objects.select_related('usuario').all()[:10]
+    ultimos_logs = Auditoria.objects.select_related('usuario').all()[:100]
     hoy = timezone.now().date()
     productos_bajo = Producto.objects.filter(stock_actual__lte=F('stock_minimo')).count()
     stats = {

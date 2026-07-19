@@ -1,0 +1,43 @@
+
+/* ===== Tablas DataTables bonitas ===== */
+.card.shadow { box-shadow: 0 .5rem 1rem rgba(0,0,0,.12) !important; border: 0; border-radius: 14px; overflow: hidden; }
+.card.shadow .card-header { background: linear-gradient(135deg, #0d6efd 0%, #3d8bfd 100%); color: #fff; border: 0; font-weight: 600; }
+
+table.datatable { border-collapse: separate !important; border-spacing: 0; width: 100% !important; }
+table.datatable thead th {
+    background: linear-gradient(135deg, #0d6efd 0%, #3d8bfd 100%) !important;
+    color: #fff !important; font-weight: 600; text-transform: uppercase; font-size: .72rem;
+    letter-spacing: .04em; border: 0 !important; padding: .85rem 1rem !important; vertical-align: middle;
+}
+table.datatable tbody td { padding: .75rem 1rem !important; vertical-align: middle; border-top: 1px solid #eef2f7; font-size: .9rem; }
+table.datatable tbody tr:hover { background: #f5f9ff !important; transition: background .15s; }
+table.datatable tbody tr:nth-child(even) { background: #fbfcfe; }
+table.datatable tbody tr:nth-child(even):hover { background: #f0f6ff !important; }
+
+/* Buscador y selector */
+div.dataTables_wrapper .dataTables_filter input,
+div.dataTables_wrapper .dataTables_length select {
+    border: 1px solid #d0d7e2; border-radius: 8px; padding: .35rem .7rem; outline: none;
+    box-shadow: none; transition: border-color .15s, box-shadow .15s;
+}
+div.dataTables_wrapper .dataTables_filter input:focus,
+div.dataTables_wrapper .dataTables_length select:focus { border-color: #0d6efd; box-shadow: 0 0 0 .2rem rgba(13,110,253,.15); }
+div.dataTables_wrapper .dataTables_filter label,
+div.dataTables_wrapper .dataTables_length label { font-size: .85rem; color: #6c757d; font-weight: 500; }
+
+/* Paginacion */
+div.dataTables_wrapper .dataTables_paginate .pagination { gap: .25rem; }
+div.dataTables_wrapper .dataTables_paginate .page-item .page-link {
+    border: 0; border-radius: 8px; color: #0d6efd; font-weight: 600; margin: 0; box-shadow: none;
+}
+div.dataTables_wrapper .dataTables_paginate .page-item.active .page-link { background: #0d6efd; color: #fff; box-shadow: 0 .25rem .5rem rgba(13,110,253,.25); }
+div.dataTables_wrapper .dataTables_paginate .page-item.disabled .page-link { color: #adb5bd; }
+div.dataTables_wrapper .dataTables_info { font-size: .82rem; color: #6c757d; padding-top: .55rem; }
+
+/* Botones de accion dentro de tablas */
+table.datatable .btn-sm { border-radius: 8px; padding: .25rem .5rem; }
+table.datatable td .btn { box-shadow: 0 .15rem .3rem rgba(0,0,0,.08); }
+
+/* Badges mas vistosos */
+.badge { font-weight: 600; letter-spacing: .02em; }
+.table-warning, tr.table-warning td { background: #fff8e1 !important; }

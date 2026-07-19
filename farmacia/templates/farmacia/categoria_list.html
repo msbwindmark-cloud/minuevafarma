@@ -5,7 +5,7 @@
 <div class="d-flex justify-content-between mb-3"><h2><i class="bi bi-tags"></i> Categorías</h2>
 <a href="{% url 'categoria_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Nueva</a></div>
 <div class="card shadow"><div class="card-body p-0">
-<table class="table mb-0 datatable"<thead class="table-light"><tr><th>Nombre</th><th>Descripción</th><th>Activo</th><th></th></tr></thead>
+<table class="table mb-0 datatable"><thead class="table-light"><tr><th>Nombre</th><th>Descripción</th><th>Activo</th><th></th></tr></thead>
 <tbody>{% for c in cats %}<tr><td>{{ c.nombre }}</td><td>{{ c.descripcion|default:"-" }}</td><td>{% if c.activo %}<i class="bi bi-check-circle text-success"></i>{% else %}<i class="bi bi-x-circle text-danger"></i>{% endif %}</td>
 <td class="text-end"><a href="{% url 'categoria_update' c.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
 <a href="{% url 'categoria_delete' c.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a></td></tr>{% empty %}<tr><td colspan="4" class="text-center">Sin categorías</td></tr>{% endfor %}</tbody></table>

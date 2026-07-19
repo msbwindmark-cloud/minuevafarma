@@ -28,7 +28,7 @@
 <div class="card shadow">
     <div class="card-header"><i class="bi bi-clock-history"></i> Últimos movimientos auditados</div>
     <div class="card-body">
-        <table class="table table-sm table-hover">
+        <table class="table table-sm table-hover datatable" id="tablaLogs">
             <thead><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Descripción</th><th>IP</th></tr></thead>
             <tbody>
             {% for log in ultimos_logs %}

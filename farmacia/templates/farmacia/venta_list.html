@@ -5,7 +5,7 @@
 <div class="d-flex justify-content-between mb-3"><h2><i class="bi bi-receipt"></i> Ventas</h2>
 <a href="{% url 'venta_nueva' %}" class="btn btn-success btn-sm"><i class="bi bi-plus-lg"></i> Nueva venta</a></div>
 <div class="card shadow"><div class="card-body p-0">
-<table class="table table-sm mb-0 datatable"<thead class="table-light"><tr><th>Código</th><th>Fecha</th><th>Cliente</th><th>Método</th><th>Total</th><th>Empleado</th><th></th></tr></thead>
+<table class="table table-sm mb-0 datatable"><thead class="table-light"><tr><th>Código</th><th>Fecha</th><th>Cliente</th><th>Método</th><th>Total</th><th>Empleado</th><th></th></tr></thead>
 <tbody>{% for v in ventas %}<tr><td>{{ v.codigo }}</td><td>{{ v.fecha|date:"d/m/Y H:i" }}</td><td>{{ v.cliente_nombre|default:"-" }}</td><td>{{ v.get_metodo_pago_display }}</td><td>{{ v.total }} EUR</td><td>{% if v.empleado %}{{ v.empleado }}{% else %}-{% endif %}</td>
 <td><a href="{% url 'venta_ticket' v.id %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-ticket"></i> Ticket</a></td></tr>{% empty %}<tr><td colspan="7" class="text-center">Sin ventas</td></tr>{% endfor %}</tbody></table>
 </div></div>
