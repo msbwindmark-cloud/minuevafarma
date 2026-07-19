@@ -15,6 +15,9 @@ git branch -M main
 git remote add origin https://github.com/msbwindmark-cloud/minuevafarma.git
 git push -u origin main
 
+farmacia
+Farmacia@2026
+
 
 
 

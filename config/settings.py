@@ -18,7 +18,7 @@ except FileNotFoundError:
 
 SECRET_KEY = env('SECRET_KEY', default='django-insecure-cambia-esta-clave-en-produccion-1234567890')
 DEBUG = env('DEBUG', default=True)
-ALLOWED_HOSTS = env('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(',')
+ALLOWED_HOSTS = env('ALLOWED_HOSTS', default='127.0.0.1,localhost,minuevafarma.pythonanywhere.com').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
