@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Perfil - MiNuevaFarma{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-person-circle"></i> Mi perfil</h2>
+<div class="row">
+    <div class="col-md-7">
+        <div class="card shadow">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">{{ form.first_name.label_tag }}{{ form.first_name }}</div>
+                        <div class="col-md-6 mb-3">{{ form.last_name.label_tag }}{{ form.last_name }}</div>
+                        <div class="col-md-6 mb-3">{{ form.email.label_tag }}{{ form.email }}</div>
+                        <div class="col-md-6 mb-3">{{ form.telefono.label_tag }}{{ form.telefono }}</div>
+                        <div class="col-md-12 mb-3">{{ form.foto.label_tag }}{{ form.foto }}</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <div class="card shadow">
+            <div class="card-body text-center">
+                <h5>Seguridad</h5>
+                <p>Verificación en dos pasos (2FA):</p>
+                <button id="btn2fa" class="btn btn-{% if user.two_factor_enabled %}success{% else %}outline-secondary{% endif %}">
+                    {% if user.two_factor_enabled %}Activado{% else %}Desactivado{% endif %}
+                </button>
+                <p class="text-muted mt-2 small">Recibirás un código por email al iniciar sesión.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+$('#btn2fa').on('click', function(){
+    $.post("{% url 'toggle_2fa' %}", {csrfmiddlewaretoken: '{{ csrf_token }}'}, function(r){
+        if(r.ok){
+            toastr.success(r.enabled ? '2FA activado' : '2FA desactivado');
+            location.reload();
+        }
+    });
+});
+</script>
+{% endblock %}

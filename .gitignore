@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+venv/
+.venv/
+env/
+
+# Django
+__pycache__/
+*.log
+db.sqlite3
+staticfiles/
+
+# Secretos (se sube el .env de forma intencionada)
+!.env
+
+# Media (subidas de usuario)
+media/
+.pth
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/

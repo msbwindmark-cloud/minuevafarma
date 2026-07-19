@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Iniciar sesión - MiNuevaFarma{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <i class="bi bi-capsule-pill text-primary" style="font-size:3rem;"></i>
+                    <h3 class="mt-2">MiNuevaFarma</h3>
+                    <p class="text-muted">Accede a tu panel de farmacia</p>
+                </div>
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.identificador.label }}</label>
+                        {{ form.identificador }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.password.label }}</label>
+                        <div class="input-group">
+                            {{ form.password }}
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword" tabindex="-1">
+                                <i class="bi bi-eye" id="iconPassword"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        {{ form.remember }}
+                        <label class="form-check-label">{{ form.remember.label }}</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="{% url 'registro' %}">Crear cuenta</a> |
+                    <a href="{% url 'password_reset_request' %}">¿Olvidaste tu contraseña?</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+$('#togglePassword').on('click', function(){
+    var input = $('#id_password');
+    var icon = $('#iconPassword');
+    if(input.attr('type') === 'password'){
+        input.attr('type', 'text');
+        icon.removeClass('bi-eye').addClass('bi-eye-slash');
+    } else {
+        input.attr('type', 'password');
+        icon.removeClass('bi-eye-slash').addClass('bi-eye');
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Panel - MiNuevaFarma{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-speedometer2"></i> Panel de control</h2>
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card text-bg-primary shadow">
+            <div class="card-body"><h5>Usuarios</h5><h2>{{ stats.usuarios }}</h2></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-bg-success shadow">
+            <div class="card-body"><h5>Logins hoy</h5><h2>{{ stats.logins_hoy }}</h2></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-bg-danger shadow">
+            <div class="card-body"><h5>Cuentas bloqueadas</h5><h2>{{ stats.bloqueados }}</h2></div>
+        </div>
+    </div>
+</div>
+<div class="card shadow">
+    <div class="card-header"><i class="bi bi-clock-history"></i> Últimos movimientos auditados</div>
+    <div class="card-body">
+        <table class="table table-sm table-hover">
+            <thead><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Descripción</th><th>IP</th></tr></thead>
+            <tbody>
+            {% for log in ultimos_logs %}
+                <tr><td>{{ log.fecha|date:"d/m/Y H:i" }}</td>
+                    <td>{{ log.usuario.nombre_completo|default:"-" }}</td>
+                    <td><span class="badge bg-secondary">{{ log.accion }}</span></td>
+                    <td>{{ log.descripcion }}</td><td>{{ log.ip|default:"-" }}</td></tr>
+            {% empty %}
+                <tr><td colspan="5" class="text-center">Sin registros</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
